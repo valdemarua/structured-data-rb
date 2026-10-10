@@ -18,6 +18,12 @@ class ValuesTest < Minitest::Test
                  Event.new(start_date: DateTime.new(2026, 10, 14, 19, 30)).to_h["startDate"]
   end
 
+  def test_any_object_with_iso8601_is_a_date
+    time_like = Struct.new(:value) { def iso8601 = value }.new("2026-10-14T19:30:00+03:00")
+
+    assert_equal "2026-10-14T19:30:00+03:00", Event.new(start_date: time_like).to_h["startDate"]
+  end
+
   def test_iso_8601_strings_including_partial_dates
     ["1947", "2026-09", "2026-09-25", "2026-09-25T08:33", "2026-09-25T08:33:00Z",
      "2026-09-25T08:33:00.123+03:00"].each do |value|

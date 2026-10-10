@@ -17,6 +17,8 @@ module StructuredData
     URL = %r{\Ahttps?://[^\s/?#]+\S*\z}
     ISO_8601 = /\A\d{4}(-\d{2}(-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?)?)?\z/
     SCHEMA_ORG = "https://schema.org/"
+    # Time, Date, DateTime and any other object that formats itself as ISO 8601.
+    TIME_LIKE = ->(value) { value.respond_to?(:iso8601) }
 
     class << self
       def properties(*names) = names.each { declare(_1, :text) }
@@ -75,7 +77,7 @@ module StructuredData
       when Array then convert_array(property, value, label)
       when Entity then value
       when String then convert_string(property, value, label)
-      when Time, Date then convert_time(property, value, label)
+      when TIME_LIKE then convert_time(property, value, label)
       when Integer, Float, true, false then convert_scalar(property, value, label)
       else invalid(label, "expected text, a number, a boolean, a date or an entity, got #{value.class}")
       end
@@ -103,7 +105,6 @@ module StructuredData
       end
     end
 
-    # DateTime is a Date subclass, so test it first. ActiveSupport::TimeWithZone reports itself as a Time.
     def convert_time(property, value, label)
       invalid(label, "expected a URL, got #{value.class}") if property.kind == :url
       invalid(label, "expected a Schema.org enum name, got #{value.class}") if property.kind == :enum

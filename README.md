@@ -73,8 +73,10 @@ StructuredData.json_ld(team)    # => '{"@context":"https://schema.org","@graph":
 Keys come out in the order you pass them, and values come out as given: a single value
 stays a single value, and an array stays an array.
 
-- `Time` becomes an ISO 8601 date-time with its offset, and `Date` becomes `YYYY-MM-DD`.
-  Strings are kept as they are, so partial dates such as `"1947"` work.
+- Dates and times are written with their own `iso8601` method: a `Time` keeps its offset,
+  and a `Date` becomes `YYYY-MM-DD`. The gem never changes time zones, so convert a time
+  to the zone you want before passing it. Strings are kept as they are, so partial dates
+  such as `"1947"` work.
 - Enum values use their Schema.org name: `event_status: "EventScheduled"` is written as
   `"https://schema.org/EventScheduled"`.
 

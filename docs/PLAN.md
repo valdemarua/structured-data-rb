@@ -158,8 +158,9 @@ Rules:
 - **`nil` and empty arrays are omitted.** This makes conditional properties free:
   `image: post.image_url`.
 - **Name mapping:** `snake_case` → `lowerCamelCase` (`date_published` → `datePublished`).
-- **Values:** `String`, `Numeric`, `true` / `false`, `Time` / `DateTime` (ISO 8601 with
-  offset), `Date` (`YYYY-MM-DD`), an entity, a `Ref`, or an array of these. Anything else
+- **Values:** `String`, `Numeric`, `true` / `false`, any object that responds to `iso8601`
+  (`Time`, `Date`, `DateTime` or a framework time class; written with its own offset, and the
+  gem never converts time zones), an entity, a `Ref`, or an array of these. Anything else
   raises `ValidationError`. Strings are kept as is, so partial dates like `"1947"` work.
 - **URL properties** (`url`, `image`, `logo`, `item`, `same_as`, `main_entity_of_page`, …):
   when given as a string, it must be an absolute `http(s)` URL.
@@ -261,7 +262,7 @@ end
 |---|---|---|
 | Ruby | `required_ruby_version >= 3.3` | 3.2 reached EOL on 2026-03-31. 3.3 is security-only until 2027-03. 3.4 and 4.0 are current. |
 | Runtime deps | `json ~> 3.0`. Nothing else. | json 3 is safe by default, has no mutable global options (Ractor-safe), rejects unknown options and duplicate keys, and supports `script_safe`. One major version means one CI configuration. |
-| Stdlib used | `json`, `uri`, `date`, `time` | No ActiveSupport, no Zeitwerk (plain `require_relative`; about 25 files). |
+| Stdlib used | `json`, `date`, `time` | No ActiveSupport, no Zeitwerk (plain `require_relative`; about 25 files). |
 | Dev deps | `minitest ~> 6.0`, `rake`, `rubocop` + `rubocop-minitest` + `rubocop-performance` | Declared in the `Gemfile`, not the gemspec (current Bundler convention). |
 | Rails (test only) | `gemfiles/rails_8_1.gemfile` | Rails 8.1+ only: ActiveSupport 8.0 passes options that json 3 rejects, so `to_json` fails. Use the `BUNDLE_GEMFILE` env in CI. No Appraisal needed. |
 
