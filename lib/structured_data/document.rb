@@ -9,12 +9,13 @@ module StructuredData
 
   class << self
     # One "@graph" document for one or more entities, as a Hash.
+    # When two top-level entities share an @id, only the first one is kept.
     def graph(*entities)
-      nodes = entities.flatten.compact.map do |entity|
+      entities = entities.flatten.compact
+      entities.each do |entity|
         raise ArgumentError, "expected a StructuredData::Entity, got #{entity.class}" unless entity.is_a?(Entity)
-
-        entity.to_h
       end
+      nodes = entities.uniq { _1.id || _1.object_id }.map(&:to_h)
       { "@context" => CONTEXT, "@graph" => nodes }
     end
 

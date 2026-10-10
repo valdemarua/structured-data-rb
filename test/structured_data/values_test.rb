@@ -82,7 +82,8 @@ class ValuesTest < Minitest::Test
   def test_unsupported_value_kind
     error = assert_raises(StructuredData::ValidationError) { Thing.new(name: { "@id" => "x" }) }
 
-    assert_equal "Thing name: expected text, a number, a boolean, a date or an entity, got Hash", error.message
+    assert_equal "Thing name: expected text, a number, a boolean, a date, an entity or a reference, got Hash",
+                 error.message
   end
 
   def test_numbers_are_rejected_for_url_and_enum_properties

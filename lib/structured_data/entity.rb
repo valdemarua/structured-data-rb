@@ -11,14 +11,11 @@ module StructuredData
   #
   # A subclass declares only its own properties and inherits the rest.
   class Entity
+    include Conversion
+
     Property = Data.define(:name, :key, :kind, :allowed)
 
     RESERVED = %i[id type context extra].freeze
-    URL = %r{\Ahttps?://[^\s/?#]+\S*\z}
-    ISO_8601 = /\A\d{4}(-\d{2}(-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?)?)?\z/
-    SCHEMA_ORG = "https://schema.org/"
-    # Time, Date, DateTime and any other object that formats itself as ISO 8601.
-    TIME_LIKE = ->(value) { value.respond_to?(:iso8601) }
 
     class << self
       def properties(*names) = names.each { declare(_1, :text) }
@@ -50,15 +47,13 @@ module StructuredData
       end
     end
 
-    def initialize(**values)
+    attr_reader :id
+
+    def initialize(id: nil, **values)
       raise NotImplementedError, "#{self.class} is abstract" if instance_of?(Entity)
 
-      declared = self.class.declared_properties
-      @values = values.each_with_object({}) do |(name, value), converted|
-        property = declared.fetch(name) { unknown_property(name) }
-        value = convert(property, value)
-        converted[property.key] = value unless value.nil?
-      end.freeze
+      @id = Ref.check_id!(id, schema_type) unless id.nil?
+      @values = convert_values(values).freeze
       freeze
     end
 
@@ -66,60 +61,32 @@ module StructuredData
 
     # The node as a string-keyed Hash, without "@context".
     def to_h
-      { "@type" => schema_type }.merge(@values.transform_values { serialize(_1) })
+      node = { "@type" => schema_type }
+      node["@id"] = id if id
+      node.merge(@values.transform_values { serialize(_1) })
+    end
+
+    # A reference to this entity, for use in other entities.
+    def ref
+      raise Error, "#{schema_type} has no id, so it cannot be referenced" unless id
+
+      Ref.new(id)
     end
 
     private
 
-    def convert(property, value, label = property.name)
-      case value
-      when nil then nil
-      when Array then convert_array(property, value, label)
-      when Entity then value
-      when String then convert_string(property, value, label)
-      when TIME_LIKE then convert_time(property, value, label)
-      when Integer, Float, true, false then convert_scalar(property, value, label)
-      else invalid(label, "expected text, a number, a boolean, a date or an entity, got #{value.class}")
+    def convert_values(values)
+      declared = self.class.declared_properties
+      values.each_with_object({}) do |(name, value), converted|
+        property = declared.fetch(name) { unknown_property(name) }
+        value = convert(property, value)
+        converted[property.key] = value unless value.nil?
       end
-    end
-
-    def convert_array(property, values, label)
-      converted = values.each_with_index.filter_map { |item, i| convert(property, item, "#{label}[#{i}]") }
-      converted.empty? ? nil : converted.freeze
-    end
-
-    def convert_string(property, value, label)
-      problem = string_problem(property, value)
-      invalid(label, "expected #{problem}, got #{value.inspect}") if problem
-      return "#{SCHEMA_ORG}#{value}" if property.kind == :enum
-
-      value.frozen? ? value : value.dup.freeze
-    end
-
-    # What the string should have been, or nil when it is fine.
-    def string_problem(property, value)
-      case property.kind
-      when :url then "an absolute http(s) URL" unless URL.match?(value)
-      when :date then "an ISO 8601 date" unless ISO_8601.match?(value)
-      when :enum then "one of #{property.allowed.join(", ")}" unless property.allowed.include?(value)
-      end
-    end
-
-    def convert_time(property, value, label)
-      invalid(label, "expected a URL, got #{value.class}") if property.kind == :url
-      invalid(label, "expected a Schema.org enum name, got #{value.class}") if property.kind == :enum
-      value.iso8601.freeze
-    end
-
-    def convert_scalar(property, value, label)
-      invalid(label, "expected a string, got #{value.class}") unless property.kind == :text
-      invalid(label, "expected a finite number, got #{value}") if value.is_a?(Float) && !value.finite?
-      value
     end
 
     def serialize(value)
       case value
-      when Entity then value.to_h
+      when Entity, Ref then value.to_h
       when Array then value.map { serialize(_1) }
       else value
       end
@@ -127,10 +94,6 @@ module StructuredData
 
     def unknown_property(name)
       raise UnknownPropertyError, "#{schema_type} does not support property :#{name}"
-    end
-
-    def invalid(label, message)
-      raise ValidationError, "#{schema_type} #{label}: #{message}"
     end
   end
 end

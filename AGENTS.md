@@ -5,7 +5,8 @@ Full design and roadmap: `docs/PLAN.md`. Read it before changing the public API.
 
 ## Architecture
 
-- `lib/structured_data/entity.rb`: base class with `properties`, `url_properties`, `date_properties` and `enum` declarations, light value checks at construction and `to_h`.
+- `lib/structured_data/entity.rb`: base class with `properties`, `url_properties`, `date_properties` and `enum` declarations, `id:`, `#ref` and `to_h`.
+- `lib/structured_data/conversion.rb`: the light value checks and conversions used by `Entity`.
 - `lib/structured_data/entities/*.rb`: one file per Schema.org type. The class name is the Schema.org type. Each declares only its own properties.
 - `lib/structured_data/ref.rb`, `ids.rb`: `@id` references and the optional `Ids` builder for common `@id` values.
 - `lib/structured_data/document.rb`: `StructuredData.graph`, `json_ld` and `script_tag`. Always one `@graph` document. This is the only place JSON is generated.
