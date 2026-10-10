@@ -33,7 +33,7 @@ Core decisions:
 - Pure Ruby core. Rails integration is an optional, thin helper.
 - No ActiveRecord introspection. Each app maps its models explicitly.
 - Validation lives in the gem. Schema.org validity is separate from Google rich-result rules.
-- Deterministic `to_h` / `to_json_ld`. Supports a single root entity and `@graph`.
+- Deterministic output: always one `@graph` document per call.
 - Out of scope: meta tags, OpenGraph, Twitter Cards, runtime schema fetching, full vocabulary,
   code generation in v0.1.
 
@@ -84,8 +84,8 @@ That is 17 small classes, each mostly a property list.
 |---|---|---|---|---|
 | [schema-dts](https://github.com/google/schema-dts) (Google, ~1.2k★) | TypeScript | Types generated from the Schema.org ontology. `WithContext<T>`, `Graph`, `@id` references. | `@context` only on the root. An explicit `@id` reference type. A generator as a later step, pinned to a vocabulary version. Its README tells you to escape `<`, `>`, `&` inside `<script>`. | Full-vocabulary types (no runtime value, huge surface). |
 | [@unhead/schema-org](https://github.com/unjs/unhead/tree/main/packages/schema-org) | Node / Vue / React | `define*` helpers for a practical subset. Nodes link automatically by `@id`. Framework-agnostic core with framework adapters. Extra properties pass through. | The scope: a curated subset focused on what search engines use. The core/adapter split (ours: pure core + Railtie). An escape hatch for extra properties. Stable `@id` conventions for site-wide nodes. | Implicit global "site config" (we pass context explicitly). Reactivity. |
-| [spatie/schema-org](https://github.com/spatie/schema-org) (~1.5k★) | PHP | Fluent builder generated from Schema.org. `Graph` with named node identifiers. `MultiTypedEntity`. `if()` for conditional properties. | `Graph` as a first-class object. Multi-type support later (e.g. `["Movie", "CreativeWork"]` is rare, so v0.2). | Fluent mutable builders: Ruby keyword arguments + `nil` omission already solve the "conditional chaining" problem. |
-| [Schema.NET](https://github.com/RehanSaeed/Schema.NET) (~700★) | .NET | Generated, strongly typed classes. `OneOrMany<T>` and `Values<T1,T2>` for union and array properties. | **Every property accepts one value or an array.** Union types per property (`author: Person \| Organization`). Serialize a single-element array as a scalar. | Codegen of the whole vocabulary. |
+| [spatie/schema-org](https://github.com/spatie/schema-org) (~1.5k★) | PHP | Fluent builder generated from Schema.org. `Graph` with named node identifiers. `MultiTypedEntity`. `if()` for conditional properties. | Multi-type support later (e.g. `["Movie", "CreativeWork"]` is rare, so v0.2). | Fluent mutable builders: Ruby keyword arguments + `nil` omission already solve the "conditional chaining" problem. |
+| [Schema.NET](https://github.com/RehanSaeed/Schema.NET) (~700★) | .NET | Generated, strongly typed classes. `OneOrMany<T>` and `Values<T1,T2>` for union and array properties. | **Every property accepts one value or an array.** | Codegen of the whole vocabulary. Per-property union types (runtime checks stay light). |
 | [teseo/schemaorg](https://pkg.go.dev/github.com/indaco/teseo/schemaorg) | Go | Plain structs, `omitempty`, constructor per type. Renders to a `templ` component or `template.HTML`. `Validate()` returns *warnings* for missing recommended fields. | `nil` → omitted (Go's `omitempty`). The renderer is separate from the data. **Profiles return warnings and do not raise**: that is how we will do Google checks later. | Positional constructors (fragile; Ruby has keyword arguments). |
 | [schema_dot_org](https://github.com/public-law/schema-dot-org) (~80★, 2.5.x) | Ruby | Declarative `validated_attr`, fails at construction, about 20 types. | Fail fast at construction. Reject unknown attributes. Readable class bodies. | ActiveModel/ActiveSupport dependency (via `validated_object`). Rendering through `to_s` (implicit, surprising). |
 
@@ -99,70 +99,83 @@ Takeaways that shape the design:
    should be declared once per page and referenced everywhere else.
 3. **Safe embedding is part of the library's job.** Every ecosystem has had
    `</script>`-injection bugs in hand-rolled JSON-LD. The library must escape by default.
-4. **Separate correctness levels.** Schema.org type correctness raises errors. Search-engine
-   recommendations (Google) produce warnings in an optional profile.
+4. **Keep runtime checks light.** Neither unhead nor schema-dts validates Schema.org at
+   runtime (unhead: helpers "do not perform runtime Schema.org or Google validation").
+   We catch the mistakes that are cheap to catch and easy to make: unknown properties,
+   relative URLs, unknown enum values. Search-engine recommendations (Google) become
+   warnings in an optional profile later.
+5. **Output what the client wrote.** Node packages emit objects as written: key order,
+   single values and arrays are left alone. No hidden reordering or normalisation.
 
 ## 4. Architecture and API
 
 ### Layers
 
 ```
-StructuredData::Entity subclasses  (vocabulary: type name + property declarations)
-        │  property DSL + type coercion/validation at construction
+StructuredData::Entity subclasses   (type name + list of supported properties)
+        │  light checks at construction
         ▼
-StructuredData::Graph               (optional; several nodes, @id linking)
-        ▼
-StructuredData::Serializer          (to_h → JSON.generate → script-safe string)
+StructuredData.json_ld(*entities)   (one @graph document, @id de-duplication,
+StructuredData.script_tag(*entities)  JSON.generate + script-safe escaping)
         ▼
 StructuredData::Rails::Helper       (optional; html_safe <script> tag in views)
 
 StructuredData::Profiles::Google    (v0.2; warnings only, never mutates output)
 ```
 
-### Entity DSL
+### Entity definitions
 
 ```ruby
 module StructuredData
-  class SportsTeam < Organization          # inheritance mirrors Schema.org only where useful
-    schema_type "SportsTeam"
-    property :sport,     String            # → "sport"
-    property :athlete,   Person,  many: true
-    property :coach,     Person,  many: true
-    property :member_of, [SportsOrganization, Ref]  # union; Ref = {"@id": ...}
+  # https://schema.org/SportsTeam
+  class SportsTeam < SportsOrganization   # inheritance mirrors Schema.org where useful
+    properties :athlete, :coach
+  end
+
+  # https://schema.org/Event
+  class Event < Thing
+    properties :start_date, :end_date, :location, :organizer, :sub_event, :super_event
+    enum :event_status, %w[EventScheduled EventCancelled EventPostponed EventRescheduled EventMovedOnline]
+  end
+
+  # https://schema.org/Thing
+  class Thing < Entity
+    properties :name, :alternate_name, :description, :same_as
+    url_properties :url, :image          # strings must be absolute http(s) URLs
   end
 end
 ```
 
+The Schema.org type name is the class name. A class declares only its own properties and
+inherits the rest.
+
 Rules:
 
 - **Keyword-only constructor.** Unknown keywords raise `StructuredData::UnknownPropertyError`.
+- **Key order and values are kept as passed.** Output is `@type`, `@id`, then properties in
+  the order the client passed them. A single value stays single and an array stays an
+  array.
 - **`nil` and empty arrays are omitted.** This makes conditional properties free:
   `image: post.image_url`.
-- **One-or-many.** A property declared `many: true` accepts a single value or an array.
-  It serializes a single value as a scalar and several as an array. Other properties
-  reject arrays.
-- **Name mapping:** `snake_case` → `lowerCamelCase` by default, with `property :x, as: "y"`
-  as an override.
-- **Value types:**
-  - `String`
-  - `URL` (absolute `http(s)` only, validated with `URI`)
-  - `Date` / `Time` / `DateTime` (ISO 8601; `Time` keeps its offset)
-  - `Integer`, `Float` / `Numeric`
-  - `true` / `false`
-  - `Enum` (e.g. `EventStatus::SCHEDULED` → `"https://schema.org/EventScheduled"`)
-  - an `Entity` subclass
-  - `Ref`
-  - a union of any of these
-- **No implicit coercion between unrelated types.** A `String` given for an `Integer`
-  property raises. `Integer` → `Float` widening is allowed.
-- **Errors carry a path,** e.g. `NewsArticle.author[1].url: expected absolute http(s) URL,
-  got "/people/x"`. One base class, `StructuredData::Error < StandardError`, and a
-  `ValidationError` subclass.
-- **Entities are immutable** (frozen after construction). `#with(**changes)` returns a copy.
+- **Name mapping:** `snake_case` → `lowerCamelCase` (`date_published` → `datePublished`).
+- **Values:** `String`, `Numeric`, `true` / `false`, `Time` / `DateTime` (ISO 8601 with
+  offset), `Date` (`YYYY-MM-DD`), an entity, a `Ref`, or an array of these. Anything else
+  raises `ValidationError`. Strings are kept as is, so partial dates like `"1947"` work.
+- **URL properties** (`url`, `image`, `logo`, `item`, `same_as`, `main_entity_of_page`, …):
+  when given as a string, it must be an absolute `http(s)` URL.
+- **Enums** take the Schema.org member name and are written as the full URL:
+  `event_status: "EventScheduled"` → `"https://schema.org/EventScheduled"`. Unknown names
+  raise.
+- **No checks on which entity goes where.** As in unhead and schema-dts at runtime, putting
+  a `Person` into `home_team` is not caught. The vocabulary test (below) keeps our own
+  declarations correct.
+- **Errors name the property,** e.g. `Person url: expected an absolute http(s) URL, got
+  "/people/x"`. One base class, `StructuredData::Error < StandardError`, with
+  `ValidationError` and `UnknownPropertyError` subclasses.
+- **Entities are immutable** (frozen after construction).
 - **`id:`** sets `@id`. `StructuredData::Ref.new("https://example.com/#organization")`
   refers to a node without repeating it, and `entity.ref` builds a `Ref` from an entity
-  that has an `id:` (it raises if there is none). Inside a `Graph`, a second full node
-  with an `@id` already present becomes a `Ref`, so each entity is described once.
+  that has an `id:` (it raises if there is none).
 - **`@id` values are chosen by the client.** The gem validates only "absolute URI". To
   make the common convention easy, it ships `StructuredData::Ids`, a plain value object with
   no global state:
@@ -170,29 +183,35 @@ Rules:
   `#site(name)` (`<base>/#<name>`), `#page(url_or_path)` (the absolute URL, fragment
   stripped) and `#entity(url_or_path, kind)` (`<url>#<kind>`). Relative paths resolve
   against `base_url`. Using it is optional.
-- **Escape hatch:** `extra: { "sameAs" => [...] }` is merged verbatim, after validation of
-  declared properties. It may not override `@type`, `@context` or declared keys. This keeps
-  clients unblocked between releases (lesson from unhead).
+- **Escape hatch:** `extra: { "sameAs" => [...] }` is merged verbatim after the declared
+  properties. It may not override `@type`, `@id` or declared keys. This keeps clients
+  unblocked between releases (lesson from unhead).
 
 ### Serialization
 
-- `#to_h` returns a string-keyed Hash. Key order is `@context` (root only), `@type`, `@id`,
-  then properties in declaration order (parent class first), then `extra`. That makes the
-  output deterministic and snapshot-testable.
-- `#to_json_ld(pretty: false)` returns a JSON String via `JSON.generate(hash, script_safe: true)`.
-  `script_safe` escapes `/` and U+2028/2029. We then also replace `<` `>` `&` with
-  `\u003c` `\u003e` `\u0026`. This is the escaping schema-dts and `ERB::Util.json_escape`
-  use, so it is safe inside `<script>` regardless of the template engine.
-  Non-ASCII text stays as UTF-8 (no `ascii_only`).
-- `StructuredData::Graph.new(*nodes).to_json_ld` returns
-  `{"@context": "https://schema.org", "@graph": [...]}`. Nested entities never repeat
-  `@context`.
-- `StructuredData.script_tag(entity_or_graph)` returns the full
-  `<script type="application/ld+json">…</script>` String. It is pure Ruby and not
+- `entity.to_h` returns the node as a string-keyed Hash, without `@context`.
+- `StructuredData.graph(*entities)` returns `{"@context" => "https://schema.org",
+  "@graph" => [...]}`. There is always one `@graph` document, even for a single entity,
+  as in unhead. If two top-level entities share an `@id`, only the first is kept.
+- `StructuredData.json_ld(*entities)` returns that document as a JSON string via
+  `JSON.generate(doc, script_safe: true)`. `script_safe` escapes `/` and U+2028/2029. We
+  then also replace `<` `>` `&` with `<` `>` `&`, the same escaping schema-dts
+  and `ERB::Util.json_escape` use, so it is safe inside `<script>` with any template
+  engine. Non-ASCII text stays as UTF-8 (no `ascii_only`).
+- `StructuredData.script_tag(*entities)` returns the full
+  `<script type="application/ld+json">…</script>` string. It is pure Ruby and not
   `html_safe` (core knows nothing about Rails).
-- No global configuration in v0.1. This matches json 3, which dropped mutable global defaults.
+- No global configuration. This matches json 3, which dropped mutable global defaults.
   Site-wide values such as the base URL and `inLanguage` are passed explicitly, e.g. through
   an `Ids` instance the client creates.
+
+### Vocabulary test
+
+A rake task downloads a pinned Schema.org release (`schemaorg-current-https.jsonld`) into
+`tmp/` and checks that every declared property exists and is allowed on its type. It also
+checks the golden fixtures, including which entity types appear under which properties.
+It runs in CI. This replaces generated types: our declarations stay hand-written, but
+cannot drift from Schema.org.
 
 ### Rails integration (`lib/structured_data/rails/*`, opt-in)
 
@@ -246,7 +265,7 @@ end
 ```
 structured-data-rb/
 ├── lib/structured_data.rb
-├── lib/structured_data/{version,error,types,property,entity,ref,ids,graph,serializer}.rb
+├── lib/structured_data/{version,error,entity,ref,ids,document}.rb
 ├── lib/structured_data/entities/*.rb
 ├── lib/structured_data/rails.rb, rails/{railtie,helper}.rb
 ├── sig/structured_data.rbs            # public API signatures (P1)
@@ -276,7 +295,9 @@ Gem name: `structured-data-rb` (free on rubygems.org as of 2026-10-10). Require 
   `test/fixtures/<name>.json`. Regenerate them with `UPDATE_FIXTURES=1 rake test` and
   review the diff.
 - **Escaping tests:** `</script>`, `<!--`, `&`, U+2028, non-ASCII text, emoji.
-- **Validation tests:** every error message is asserted, including its path.
+- **Validation tests:** every error message is asserted.
+- **Vocabulary test:** `rake vocab` checks declarations and fixtures against the pinned
+  Schema.org release (see section 4).
 - **Rails helper tests:** use `ActionView::TestCase` under `test/rails`, skipped when
   Rails isn't loaded.
 - **External validation (manual, before each release):** paste the fixtures into
@@ -335,11 +356,11 @@ Each step is one PR with tests, and each keeps `master` releasable.
 |---|---|---|
 | 0 | Repo skeleton: gemspec, Gemfile, Rakefile, rubocop, CI, CHANGELOG | CI is green on an empty test suite. `gem build` works. |
 | 1 | Lock the API with 3 golden fixtures written first (news article, sports team, match between two teams) | Fixtures reviewed against validator.schema.org. |
-| 2 | Core: `Entity`, `property`, scalar types, `to_h`, serializer + escaping | Escaping and key-order tests pass. |
-| 3 | Nesting, `many:`, unions, `Ref`, `id:`, `#ref`, `Ids`, `Graph` (with duplicate-`@id` collapsing) | Graph fixture passes. |
-| 4 | Validation errors with paths. Unknown-key rejection. `extra:` | Every error path is tested. |
+| 2 | Core: `Entity`, `properties` / `url_properties` / `enum`, value conversion, `to_h`, `StructuredData.graph` / `json_ld` / `script_tag` + escaping | Escaping and value tests pass. |
+| 3 | Nested entities, arrays, `Ref`, `id:`, `#ref`, `Ids`, `@id` de-duplication in the document | Fixtures with refs pass. |
+| 4 | Errors (unknown property, value kind, URL, enum), `extra:`, `rake vocab` in CI | Every error is tested. Vocabulary check is green. |
 | 5 | Shared entities: Thing, Organization, Person, ImageObject, Place, WebSite, WebPage, BreadcrumbList/ListItem, plus `BreadcrumbList.from([[name, url], ...])` (auto positions, last item may omit the URL) | Fixtures pass. |
-| 6 | NewsArticle/Article, SportsOrganization, SportsTeam, StadiumOrArena, SportsEvent (+ `subEvent`), `EventStatus` enum | All sports fixtures pass. |
+| 6 | NewsArticle/Article, SportsOrganization, SportsTeam, StadiumOrArena, SportsEvent (+ `subEvent`), `event_status` enum | All sports fixtures pass. |
 | 7 | Movie + AggregateRating | Movie fixture passes. |
 | 8 | Optional Rails Railtie + `structured_data_tag` | The Rails 8.1 CI job is green. |
 | 9 | End-to-end check in a sample Rails app (`test/dummy`): article, breadcrumbs, team, person, event pages | Rich Results Test passes for article and breadcrumb. No warnings we can't explain. |
@@ -355,7 +376,7 @@ Each step is one PR with tests, and each keeps `master` releasable.
   measurable wins. Set expectations accordingly.
 - **Decided: error messages are English only,** like all names and examples in the docs.
 - **Decided: clients choose `@id` values; the gem provides helpers.** That means `id:`, `Ref`,
-  `#ref`, `Graph` de-duplication and the optional `Ids` builder for the common convention
+  `#ref`, `@id` de-duplication and the optional `Ids` builder for the common convention
   (`<base>/#organization`, `<base>/#website`, the canonical URL for pages,
   `<canonical>#<kind>` for a page's main entity).
 

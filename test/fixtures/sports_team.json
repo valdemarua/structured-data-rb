@@ -1,0 +1,49 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SportsTeam",
+      "@id": "https://example.com/teams/riverside-rovers#team",
+      "name": "Riverside Rovers",
+      "alternateName": "Rovers",
+      "url": "https://example.com/teams/riverside-rovers",
+      "logo": "https://example.com/images/teams/riverside-rovers.png",
+      "foundingDate": "1947",
+      "location": {
+        "@type": "StadiumOrArena",
+        "name": "Riverside Arena"
+      },
+      "memberOf": {
+        "@type": "SportsOrganization",
+        "@id": "https://example.com/leagues/national-league#organization",
+        "name": "National League",
+        "url": "https://example.com/leagues/national-league",
+        "sport": "Basketball"
+      },
+      "sport": "Basketball",
+      "athlete": [
+        {
+          "@type": "Person",
+          "@id": "https://example.com/people/sam-carter#person",
+          "name": "Sam Carter",
+          "url": "https://example.com/people/sam-carter",
+          "image": "https://example.com/images/people/sam-carter.png",
+          "birthDate": "2001-03-04"
+        },
+        {
+          "@type": "Person",
+          "@id": "https://example.com/people/lee-park#person",
+          "name": "Lee Park",
+          "url": "https://example.com/people/lee-park",
+          "birthDate": "1999-11-20"
+        }
+      ],
+      "coach": {
+        "@type": "Person",
+        "@id": "https://example.com/people/alex-morgan#person",
+        "name": "Alex Morgan",
+        "url": "https://example.com/people/alex-morgan"
+      }
+    }
+  ]
+}

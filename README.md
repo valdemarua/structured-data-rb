@@ -7,17 +7,19 @@ safe `<script>` embedding. A small optional Rails helper is included.
 > before 1.0. See [docs/PLAN.md](docs/PLAN.md).
 
 ```ruby
-StructuredData::NewsArticle.new(
+article = StructuredData::NewsArticle.new(
   headline: "City council approves new bike lanes",
   url: "https://example.com/news/bike-lanes",
   date_published: Time.new(2026, 9, 25, 8, 33, 0, "+03:00"),
   in_language: "en",
   publisher: StructuredData::Organization.new(name: "Example News", url: "https://example.com/")
-).to_json_ld
+)
+
+StructuredData.json_ld(article)
 ```
 
 ```json
-{"@context":"https://schema.org","@type":"NewsArticle","headline":"City council approves new bike lanes","url":"https:\/\/example.com\/news\/bike-lanes","datePublished":"2026-09-25T08:33:00+03:00","inLanguage":"en","publisher":{"@type":"Organization","name":"Example News","url":"https:\/\/example.com\/"}}
+{"@context":"https://schema.org","@graph":[{"@type":"NewsArticle","headline":"City council approves new bike lanes","url":"https:\/\/example.com\/news\/bike-lanes","datePublished":"2026-09-25T08:33:00+03:00","inLanguage":"en","publisher":{"@type":"Organization","name":"Example News","url":"https:\/\/example.com\/"}}]}
 ```
 
 Forward slashes are escaped (`\/`) so the output is safe inside a `<script>` tag. JSON
@@ -30,8 +32,8 @@ parsers read it as an ordinary `/`.
 - **Almost no dependencies.** The only runtime dependency is Ruby's own
   [`json`](https://github.com/ruby/json) library (version 3). No Rails, ActiveSupport or
   ActiveRecord is needed.
-- **Fails early.** Wrong types and unknown properties raise errors that name the exact
-  property path.
+- **Fails early.** Unknown properties, relative URLs and unknown enum values raise errors
+  that name the property.
 - **Safe to embed.** Output is escaped for `<script>` tags. Non-ASCII text (Cyrillic, CJK,
   emoji) stays readable.
 - **Works with any app.** The gem knows nothing about your models, routes or domain. You
@@ -48,7 +50,9 @@ Requires Ruby 3.3+ and `json` 3.x. The optional Rails integration requires Rails
 
 ## Usage
 
-### One entity
+### Entities and documents
+
+Entities are plain Ruby objects. Pass Schema.org properties as `snake_case` keywords:
 
 ```ruby
 require "structured_data"
@@ -61,9 +65,18 @@ team = StructuredData::SportsTeam.new(
   founding_date: "1947"
 )
 
-team.to_h        # => {"@context" => "https://schema.org", "@type" => "SportsTeam", ...}
-team.to_json_ld  # => JSON string
+team.to_h                       # => {"@type" => "SportsTeam", "name" => "Riverside Rovers", ...}
+StructuredData.json_ld(team)    # => '{"@context":"https://schema.org","@graph":[{...}]}'
 ```
+
+`StructuredData.json_ld` always returns one `@graph` document, for one entity or many.
+Keys come out in the order you pass them, and values come out as given: a single value
+stays a single value, and an array stays an array.
+
+- `Time` becomes an ISO 8601 date-time with its offset, and `Date` becomes `YYYY-MM-DD`.
+  Strings are kept as they are, so partial dates such as `"1947"` work.
+- Enum values use their Schema.org name: `event_status: "EventScheduled"` is written as
+  `"https://schema.org/EventScheduled"`.
 
 Properties set to `nil` are left out, so optional data needs no conditionals:
 
@@ -95,13 +108,12 @@ article = StructuredData::NewsArticle.new(
   about: team.ref
 )
 
-StructuredData::Graph.new(organization, team, article).to_json_ld
+StructuredData.json_ld(organization, team, article)
 # => {"@context":"https://schema.org","@graph":[{...Organization...},{...SportsTeam...},{...NewsArticle...}]}
 ```
 
-If you only have the ID string, use `StructuredData::Ref.new(id)`. Inside a `Graph`, an
-entity whose `@id` has already appeared is written as a reference, so each entity is
-described only once.
+If you only have the ID string, use `StructuredData::Ref.new(id)`. If the same `@id` is
+passed twice, the document keeps only the first node, so each entity is described once.
 
 #### Building `@id` values
 
@@ -131,7 +143,7 @@ multi-site apps. Using it is optional: any absolute URI works as an `id:`.
 Without Rails:
 
 ```ruby
-StructuredData.script_tag(team)
+StructuredData.script_tag(organization, team, article)
 # => "<script type=\"application/ld+json\">{...}</script>"
 ```
 
@@ -143,7 +155,7 @@ gem "structured-data-rb", require: ["structured_data", "structured_data/rails"]
 ```
 
 ```erb
-<%# one entity, or several (rendered as @graph) %>
+<%# takes one or more entities, like StructuredData.json_ld %>
 <%= structured_data_tag(ArticleSchema.new(@article, self).call, BreadcrumbsSchema.new(@article, self).call) %>
 ```
 
@@ -187,14 +199,14 @@ StructuredData::BreadcrumbList.from([
 ])
 ```
 
-This returns an ordinary `BreadcrumbList`, so `id:`, `Graph` and validation work as usual.
+This returns an ordinary `BreadcrumbList`, so `id:` and validation work as usual.
 If you need more control over an item, build it with `StructuredData::ListItem` directly.
 
 ### Errors
 
 ```ruby
 StructuredData::Person.new(name: "Jane Doe", url: "/people/jane-doe")
-# => StructuredData::ValidationError: Person.url: expected absolute http(s) URL, got "/people/jane-doe"
+# => StructuredData::ValidationError: Person url: expected an absolute http(s) URL, got "/people/jane-doe"
 
 StructuredData::Person.new(name: "Jane Doe", team: "Rovers")
 # => StructuredData::UnknownPropertyError: Person does not support property :team
@@ -220,8 +232,8 @@ If a type you need is missing, use `extra:` for now and open an issue.
 
 ## Scope
 
-**In scope:** Schema.org JSON-LD entities, validation, `@graph` and `@id` references and
-helpers, safe rendering.
+**In scope:** Schema.org JSON-LD entities, light validation, `@graph` documents, `@id`
+references and helpers, safe rendering.
 
 **Out of scope:** Microdata, RDFa, OpenGraph, Twitter Cards, meta tags, automatic
 ActiveRecord mapping, and the full Schema.org vocabulary.
