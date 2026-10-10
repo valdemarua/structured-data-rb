@@ -48,7 +48,8 @@ documented recommendations where Google has a matching feature.
 2. `Article` and `NewsArticle`, with `Person` / `Organization` as `author` and `publisher`,
    `ImageObject`, and `about` / `mentions` references to other entities. Article is a
    Google rich-result feature.
-3. `BreadcrumbList` + `ListItem`. Also a Google rich-result feature.
+3. `BreadcrumbList` + `ListItem`. Also a Google rich-result feature. Includes the
+   `BreadcrumbList.from` shortcut for `[name, url]` pairs.
 4. `SportsOrganization` (a league) and `SportsTeam`: `sport`, `logo`, `foundingDate`,
    `memberOf`, `athlete`, `coach`.
 5. `Person` for athletes and authors: `name`, `alternateName`, `image`, `birthDate`,
@@ -337,7 +338,7 @@ Each step is one PR with tests, and each keeps `master` releasable.
 | 2 | Core: `Entity`, `property`, scalar types, `to_h`, serializer + escaping | Escaping and key-order tests pass. |
 | 3 | Nesting, `many:`, unions, `Ref`, `id:`, `#ref`, `Ids`, `Graph` (with duplicate-`@id` collapsing) | Graph fixture passes. |
 | 4 | Validation errors with paths. Unknown-key rejection. `extra:` | Every error path is tested. |
-| 5 | Shared entities: Thing, Organization, Person, ImageObject, Place, WebSite, WebPage, BreadcrumbList/ListItem | Fixtures pass. |
+| 5 | Shared entities: Thing, Organization, Person, ImageObject, Place, WebSite, WebPage, BreadcrumbList/ListItem, plus `BreadcrumbList.from([[name, url], ...])` (auto positions, last item may omit the URL) | Fixtures pass. |
 | 6 | NewsArticle/Article, SportsOrganization, SportsTeam, StadiumOrArena, SportsEvent (+ `subEvent`), `EventStatus` enum | All sports fixtures pass. |
 | 7 | Movie + AggregateRating | Movie fixture passes. |
 | 8 | Optional Rails Railtie + `structured_data_tag` | The Rails 8.1 CI job is green. |

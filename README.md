@@ -27,8 +27,9 @@ parsers read it as an ordinary `/`.
 
 - **JSON-LD only.** It is the format search engines recommend, and the only one this gem
   produces.
-- **Pure Ruby core.** The only runtime dependency is [`json`](https://github.com/ruby/json) 3.
-  No Rails, ActiveSupport or ActiveRecord is needed.
+- **Almost no dependencies.** The only runtime dependency is Ruby's own
+  [`json`](https://github.com/ruby/json) library (version 3). No Rails, ActiveSupport or
+  ActiveRecord is needed.
 - **Fails early.** Wrong types and unknown properties raise errors that name the exact
   property path.
 - **Safe to embed.** Output is escaped for `<script>` tags. Non-ASCII text (Cyrillic, CJK,
@@ -172,6 +173,22 @@ class ArticleSchema
   end
 end
 ```
+
+### Breadcrumbs
+
+Build a `BreadcrumbList` from `[name, url]` pairs. Positions are numbered for you, and the
+current page can be listed without a URL:
+
+```ruby
+StructuredData::BreadcrumbList.from([
+  ["Home", "https://example.com/"],
+  ["Teams", "https://example.com/teams"],
+  ["Riverside Rovers"]                     # current page
+])
+```
+
+This returns an ordinary `BreadcrumbList`, so `id:`, `Graph` and validation work as usual.
+If you need more control over an item, build it with `StructuredData::ListItem` directly.
 
 ### Errors
 
