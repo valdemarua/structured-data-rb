@@ -9,3 +9,5 @@ and the project uses [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Gem skeleton: gemspec, Minitest and RuboCop setup, CI and release workflows.
+- `StructuredData::Entity` base class with `properties`, `url_properties`, `date_properties` and `enum` declarations, and light value checks.
+- `StructuredData.graph`, `json_ld` and `script_tag`: one `@graph` document, escaped for `<script>` tags.
