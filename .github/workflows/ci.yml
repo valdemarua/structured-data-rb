@@ -24,6 +24,7 @@ jobs:
           ruby-version: "4.0"
           bundler-cache: true
       - run: bundle exec rubocop
+      - run: bundle exec rake vocab
 
   test:
     runs-on: ubuntu-latest

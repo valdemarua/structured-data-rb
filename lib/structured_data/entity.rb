@@ -49,11 +49,14 @@ module StructuredData
 
     attr_reader :id
 
-    def initialize(id: nil, **values)
+    # extra: Schema.org properties the gem does not model yet, as a Hash with camelCase String keys.
+    # They are written verbatim after the declared properties.
+    def initialize(id: nil, extra: nil, **values)
       raise NotImplementedError, "#{self.class} is abstract" if instance_of?(Entity)
 
       @id = Ref.check_id!(id, schema_type) unless id.nil?
       @values = convert_values(values).freeze
+      @extra = convert_extra(extra).freeze
       freeze
     end
 
@@ -63,7 +66,7 @@ module StructuredData
     def to_h
       node = { "@type" => schema_type }
       node["@id"] = id if id
-      node.merge(@values.transform_values { serialize(_1) })
+      node.merge(@values.transform_values { serialize(_1) }, @extra.transform_values { serialize(_1) })
     end
 
     # A reference to this entity, for use in other entities.
@@ -88,6 +91,7 @@ module StructuredData
       case value
       when Entity, Ref then value.to_h
       when Array then value.map { serialize(_1) }
+      when Hash then value.transform_values { serialize(_1) }
       else value
       end
     end

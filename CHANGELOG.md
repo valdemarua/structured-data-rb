@@ -13,3 +13,4 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - `StructuredData.graph`, `json_ld` and `script_tag`: one `@graph` document, escaped for `<script>` tags.
 - `id:` on entities, `StructuredData::Ref` and `entity.ref` for `@id` references. Top-level entities with the same `@id` are written once.
 - `StructuredData::Ids` for building `@id` values (`organization`, `website`, `site`, `page`, `entity`).
+- `extra:` on entities for Schema.org properties the gem does not model yet.

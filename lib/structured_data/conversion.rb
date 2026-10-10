@@ -58,6 +58,45 @@ module StructuredData
       value
     end
 
+    def convert_extra(extra)
+      return {} if extra.nil?
+
+      invalid("extra", "expected a Hash, got #{extra.class}") unless extra.is_a?(Hash)
+
+      declared = self.class.declared_properties.values.to_h { [_1.key, _1.name] }
+      extra.to_h do |key, value|
+        check_extra_key(key, declared)
+        [key.dup.freeze, convert_extra_value(value, "extra[#{key.inspect}]")]
+      end
+    end
+
+    def check_extra_key(key, declared)
+      label = "extra[#{key.inspect}]"
+      invalid(label, "expected a String key, got #{key.class}") unless key.is_a?(String)
+      invalid(label, "keys starting with @ are not allowed") if key.start_with?("@")
+      return unless declared.key?(key)
+
+      invalid(label, "#{key} is a declared property, use the #{declared[key]}: keyword instead")
+    end
+
+    # JSON values, entities and references, kept as given.
+    def convert_extra_value(value, label)
+      case value
+      when Array, Hash then convert_extra_collection(value, label)
+      when String then value.frozen? ? value : value.dup.freeze
+      when nil, true, false, Integer, Float, Entity, Ref then value
+      else invalid(label, "expected a JSON value, an entity or a reference, got #{value.class}")
+      end
+    end
+
+    def convert_extra_collection(value, label)
+      if value.is_a?(Array)
+        value.each_with_index.map { |item, i| convert_extra_value(item, "#{label}[#{i}]") }.freeze
+      else
+        value.to_h { |k, v| [k.to_s.freeze, convert_extra_value(v, "#{label}[#{k.to_s.inspect}]")] }.freeze
+      end
+    end
+
     def invalid(label, message)
       raise ValidationError, "#{schema_type} #{label}: #{message}"
     end

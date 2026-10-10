@@ -213,10 +213,11 @@ Rules:
 
 ### Vocabulary test
 
-A rake task downloads a pinned Schema.org release (`schemaorg-current-https.jsonld`) into
-`tmp/` and checks that every declared property exists and is allowed on its type. It also
+`rake vocab` downloads a pinned Schema.org release (`Vocabulary::VERSION`, currently 30.1)
+into `tmp/` and checks every entity class: the type exists, each property exists and is
+allowed on the type, date properties have a date range, and enum members are valid. It also
 checks the golden fixtures, including which entity types appear under which properties.
-It runs in CI. This replaces generated types: our declarations stay hand-written, but
+It runs in CI. The checker lives in `test/support/vocabulary.rb` and is not shipped. This replaces generated types: our declarations stay hand-written, but
 cannot drift from Schema.org.
 
 ### Rails integration (`lib/structured_data/rails/*`, opt-in)
@@ -370,8 +371,9 @@ Each step is one PR with tests, and each keeps `master` releasable.
 | 7 | Movie + AggregateRating | Movie fixture passes. |
 | 8 | Optional Rails Railtie + `structured_data_tag` | The Rails 8.1 CI job is green. |
 | 9 | End-to-end check in a sample Rails app (`test/dummy`): article, breadcrumbs, team, person, event pages | Rich Results Test passes for article and breadcrumb. No warnings we can't explain. |
-| 10 | Release 0.1.0 through trusted publishing | The gem is installable. Attestation is visible on rubygems.org. |
-| 11 | Retro: Google profile (warnings), RBS, codegen decision | Issues filed for v0.2. |
+| 10 | Trial in internal projects, installed from GitHub (`github: "valdemarua/structured-data-rb"`) | The gem covers real pages without workarounds. Rich Results Test and Search Console show no unexpected issues. |
+| 11 | Release 0.1.0 through trusted publishing | The gem is installable. Attestation is visible on rubygems.org. |
+| 12 | Retro: Google profile (warnings), RBS, codegen decision | Issues filed for v0.2. |
 
 ## 7. Risks and open questions
 

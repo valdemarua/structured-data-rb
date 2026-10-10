@@ -41,9 +41,11 @@ parsers read it as an ordinary `/`.
 
 ## Installation
 
+The gem is not on rubygems.org yet. Until the first release, install it from GitHub:
+
 ```ruby
 # Gemfile
-gem "structured-data-rb"
+gem "structured-data-rb", github: "valdemarua/structured-data-rb"
 ```
 
 Requires Ruby 3.3+ and `json` 3.x. The optional Rails integration requires Rails 8.1+.
