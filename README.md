@@ -19,7 +19,7 @@ StructuredData.json_ld(article)
 ```
 
 ```json
-{"@context":"https://schema.org","@graph":[{"@type":"NewsArticle","headline":"City council approves new bike lanes","url":"https:\/\/example.com\/news\/bike-lanes","datePublished":"2026-09-25T08:33:00+03:00","inLanguage":"en","publisher":{"@type":"Organization","name":"Example News","url":"https:\/\/example.com\/"}}]}
+{"@context":"https:\/\/schema.org","@graph":[{"@type":"NewsArticle","headline":"City council approves new bike lanes","url":"https:\/\/example.com\/news\/bike-lanes","datePublished":"2026-09-25T08:33:00+03:00","inLanguage":"en","publisher":{"@type":"Organization","name":"Example News","url":"https:\/\/example.com\/"}}]}
 ```
 
 Forward slashes are escaped (`\/`) so the output is safe inside a `<script>` tag. JSON
@@ -68,7 +68,7 @@ team = StructuredData::SportsTeam.new(
 )
 
 team.to_h                       # => {"@type" => "SportsTeam", "name" => "Riverside Rovers", ...}
-StructuredData.json_ld(team)    # => '{"@context":"https://schema.org","@graph":[{...}]}'
+StructuredData.json_ld(team)    # => '{"@context":"https:\/\/schema.org","@graph":[{...}]}'
 ```
 
 `StructuredData.json_ld` always returns one `@graph` document, for one entity or many.
@@ -219,18 +219,23 @@ StructuredData::Person.new(name: "Jane Doe", team: "Rovers")
 If you need a Schema.org property the gem does not model yet, pass it through `extra:`:
 
 ```ruby
-StructuredData::Person.new(name: "Jane Doe", extra: { "sameAs" => ["https://www.wikidata.org/wiki/Q42"] })
+StructuredData::Person.new(name: "Jane Doe", extra: { "knowsLanguage" => ["en", "es"] })
 ```
 
 ## Supported types (v0.1)
 
 | Group | Types |
 |---|---|
-| Core | `Thing`, `Organization`, `Person`, `ImageObject`, `Place`, `WebSite`, `WebPage` |
-| Navigation | `BreadcrumbList`, `ListItem` |
+| Core | `Thing`, `CreativeWork`, `Organization`, `Person`, `ImageObject`, `Place` |
+| Site | `WebSite`, `WebPage`, `CollectionPage` |
+| Lists | `ItemList`, `BreadcrumbList`, `ListItem` |
 | Content | `Article`, `NewsArticle` |
-| Sports | `SportsOrganization`, `SportsTeam`, `SportsEvent`, `StadiumOrArena` |
-| Media | `Movie`, `AggregateRating` |
+| Events | `Event`, `SportsEvent` |
+| Sports | `SportsOrganization`, `SportsTeam`, `StadiumOrArena` |
+| Media (planned for 0.1) | `Movie`, `AggregateRating` |
+
+Each type supports the Schema.org properties listed in its file in
+[`lib/structured_data/entities`](lib/structured_data/entities), plus everything it inherits.
 
 If a type you need is missing, use `extra:` for now and open an issue.
 

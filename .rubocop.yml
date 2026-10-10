@@ -24,3 +24,11 @@ Metrics/BlockLength:
   Exclude:
     - "*.gemspec"
     - "test/**/*"
+
+Metrics/MethodLength:
+  Exclude:
+    - "test/**/*"
+
+Metrics/AbcSize:
+  Exclude:
+    - "test/**/*"

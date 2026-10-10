@@ -73,10 +73,11 @@ documented recommendations where Google has a matching feature.
   `Person` instead.
 - Standings or league tables. There is no suitable Schema.org type.
 
-**v0.1 entity list:** `Thing` (base), `Organization`, `SportsOrganization`, `SportsTeam`,
-`Person`, `ImageObject`, `Place`, `StadiumOrArena`, `WebSite`, `WebPage`, `Article`,
-`NewsArticle`, `SportsEvent`, `BreadcrumbList`, `ListItem`, `Movie`, `AggregateRating`.
-That is 17 small classes, each mostly a property list.
+**v0.1 entity list:** `Thing` (base), `CreativeWork`, `Organization`, `SportsOrganization`,
+`SportsTeam`, `Person`, `ImageObject`, `Place`, `StadiumOrArena`, `WebSite`, `WebPage`,
+`CollectionPage`, `ItemList`, `BreadcrumbList`, `ListItem`, `Article`, `NewsArticle`, `Event`,
+`SportsEvent`, `Movie`, `AggregateRating`. Each is a short property list; intermediate
+Schema.org types (`Intangible`, `MediaObject`, `CivicStructure`) are skipped where nothing needs them.
 
 ## 3. Lessons from other ecosystems
 

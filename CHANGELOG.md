@@ -14,3 +14,4 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - `id:` on entities, `StructuredData::Ref` and `entity.ref` for `@id` references. Top-level entities with the same `@id` are written once.
 - `StructuredData::Ids` for building `@id` values (`organization`, `website`, `site`, `page`, `entity`).
 - `extra:` on entities for Schema.org properties the gem does not model yet.
+- Schema.org types: `Thing`, `CreativeWork`, `Organization`, `Person`, `ImageObject`, `Place`, `WebSite`, `WebPage`, `CollectionPage`, `ItemList`, `BreadcrumbList` (with `BreadcrumbList.from`), `ListItem`, `Article`, `NewsArticle`, `Event`, `SportsEvent`, `SportsOrganization`, `SportsTeam`, `StadiumOrArena`.

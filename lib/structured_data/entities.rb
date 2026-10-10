@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+# Schema.org types, parents before children.
+require_relative "entities/thing"
+require_relative "entities/creative_work"
+require_relative "entities/organization"
+require_relative "entities/sports_organization"
+require_relative "entities/sports_team"
+require_relative "entities/person"
+require_relative "entities/image_object"
+require_relative "entities/place"
+require_relative "entities/stadium_or_arena"
+require_relative "entities/web_site"
+require_relative "entities/web_page"
+require_relative "entities/collection_page"
+require_relative "entities/item_list"
+require_relative "entities/breadcrumb_list"
+require_relative "entities/list_item"
+require_relative "entities/article"
+require_relative "entities/news_article"
+require_relative "entities/event"
+require_relative "entities/sports_event"
