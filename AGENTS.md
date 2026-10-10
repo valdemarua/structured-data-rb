@@ -5,7 +5,7 @@ Full design and roadmap: `docs/PLAN.md`. Read it before changing the public API.
 
 ## Architecture
 
-- `lib/structured_data/entity.rb`: base class with `properties`, `url_properties` and `enum` declarations, light value checks at construction and `to_h`.
+- `lib/structured_data/entity.rb`: base class with `properties`, `url_properties`, `date_properties` and `enum` declarations, light value checks at construction and `to_h`.
 - `lib/structured_data/entities/*.rb`: one file per Schema.org type. The class name is the Schema.org type. Each declares only its own properties.
 - `lib/structured_data/ref.rb`, `ids.rb`: `@id` references and the optional `Ids` builder for common `@id` values.
 - `lib/structured_data/document.rb`: `StructuredData.graph`, `json_ld` and `script_tag`. Always one `@graph` document. This is the only place JSON is generated.
@@ -18,7 +18,7 @@ Full design and roadmap: `docs/PLAN.md`. Read it before changing the public API.
 - JSON-LD only. Add Schema.org types and properties deliberately, following the order in `docs/PLAN.md`; never model the full vocabulary. Each entity file starts with a comment linking its `https://schema.org/<Type>` page.
 - Output follows what the client passed: `@type`, `@id`, then properties in the order given; single values and arrays are kept as is. `nil` values and empty arrays are omitted.
 - Escaping is mandatory. JSON goes through `JSON.generate(..., script_safe: true)` and then `<`, `>` and `&` are replaced with `\u003c`, `\u003e` and `\u0026`. Never generate JSON outside `document.rb`.
-- Runtime checks stay light (unknown properties, value kinds, absolute URLs, enum names) and raise `StructuredData::Error` subclasses. Google recommendations are warnings in a profile and never raise. Declarations are checked against Schema.org by `rake vocab`.
+- Runtime checks stay light (unknown properties, value kinds, absolute URLs, ISO 8601 dates, enum names) and raise `StructuredData::Error` subclasses. Google recommendations are warnings in a profile and never raise. Declarations are checked against Schema.org by `rake vocab`.
 - No global mutable configuration.
 - The gem is client-agnostic: it provides building blocks and helpers, and mapping a client's models to entities is the client's job. Never reference specific client apps or sites in code, tests, docs or issues.
 - All names and examples in code, tests and docs are in English and generic (`example.com`, "Jane Doe").

@@ -163,12 +163,17 @@ Rules:
   raises `ValidationError`. Strings are kept as is, so partial dates like `"1947"` work.
 - **URL properties** (`url`, `image`, `logo`, `item`, `same_as`, `main_entity_of_page`, …):
   when given as a string, it must be an absolute `http(s)` URL.
+- **Date properties** (`date_published`, `start_date`, `birth_date`, `founding_date`, …),
+  declared with `date_properties`: a string must be ISO 8601, full or partial (`1947`,
+  `2026-09`, `2026-09-25`, `2026-09-25T08:33:00+03:00`).
 - **Enums** take the Schema.org member name and are written as the full URL:
   `event_status: "EventScheduled"` → `"https://schema.org/EventScheduled"`. Unknown names
   raise.
 - **No checks on which entity goes where.** As in unhead and schema-dts at runtime, putting
-  a `Person` into `home_team` is not caught. The vocabulary test (below) keeps our own
-  declarations correct.
+  a `Person` into `home_team` is not caught. Generating runtime rules from the vocabulary
+  was considered and rejected as too much machinery for a builder. Clients check meaning
+  with the Schema.org validator, Google's Rich Results Test and Search Console (see
+  README). The vocabulary test (below) keeps our own declarations correct.
 - **Errors name the property,** e.g. `Person url: expected an absolute http(s) URL, got
   "/people/x"`. One base class, `StructuredData::Error < StandardError`, with
   `ValidationError` and `UnknownPropertyError` subclasses.
@@ -356,9 +361,9 @@ Each step is one PR with tests, and each keeps `master` releasable.
 |---|---|---|
 | 0 | Repo skeleton: gemspec, Gemfile, Rakefile, rubocop, CI, CHANGELOG | CI is green on an empty test suite. `gem build` works. |
 | 1 | Lock the API with 3 golden fixtures written first (news article, sports team, match between two teams) | Fixtures reviewed against validator.schema.org. |
-| 2 | Core: `Entity`, `properties` / `url_properties` / `enum`, value conversion, `to_h`, `StructuredData.graph` / `json_ld` / `script_tag` + escaping | Escaping and value tests pass. |
+| 2 | Core: `Entity`, `properties` / `url_properties` / `date_properties` / `enum`, value conversion, `to_h`, `StructuredData.graph` / `json_ld` / `script_tag` + escaping | Escaping and value tests pass. |
 | 3 | Nested entities, arrays, `Ref`, `id:`, `#ref`, `Ids`, `@id` de-duplication in the document | Fixtures with refs pass. |
-| 4 | Errors (unknown property, value kind, URL, enum), `extra:`, `rake vocab` in CI | Every error is tested. Vocabulary check is green. |
+| 4 | Errors (unknown property, value kind, URL, date, enum), `extra:`, `rake vocab` in CI | Every error is tested. Vocabulary check is green. |
 | 5 | Shared entities: Thing, Organization, Person, ImageObject, Place, WebSite, WebPage, BreadcrumbList/ListItem, plus `BreadcrumbList.from([[name, url], ...])` (auto positions, last item may omit the URL) | Fixtures pass. |
 | 6 | NewsArticle/Article, SportsOrganization, SportsTeam, StadiumOrArena, SportsEvent (+ `subEvent`), `event_status` enum | All sports fixtures pass. |
 | 7 | Movie + AggregateRating | Movie fixture passes. |

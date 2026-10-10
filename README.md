@@ -238,9 +238,23 @@ references and helpers, safe rendering.
 **Out of scope:** Microdata, RDFa, OpenGraph, Twitter Cards, meta tags, automatic
 ActiveRecord mapping, and the full Schema.org vocabulary.
 
-A valid Schema.org document is not the same as a Google rich result. Check pages with the
-[Schema.org validator](https://validator.schema.org/) and
-[Google's Rich Results Test](https://search.google.com/test/rich-results).
+## Checking your output
+
+The gem catches cheap, obvious mistakes when an entity is built: unknown properties,
+relative URLs, malformed dates and unknown enum values. It does not check whether, say,
+a `Person` belongs in `home_team`, or whether Google will show a rich result. Use these
+tools for that:
+
+- [Google's Rich Results Test](https://search.google.com/test/rich-results): which rich
+  results a page qualifies for, with errors and warnings.
+- [Schema.org validator](https://validator.schema.org/): types and properties against the
+  full vocabulary.
+- [Google Search Console](https://search.google.com/search-console) → Enhancements:
+  structured-data issues across all indexed pages, including ones caused by real data.
+- Your own tests: assert the output of `StructuredData.json_ld(...)` for each page type.
+
+Check each page type once in the validators when you add it, then let Search Console
+monitor production.
 
 ## Development
 
