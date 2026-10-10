@@ -43,7 +43,7 @@ parsers read it as an ordinary `/`.
 gem "structured-data-rb"
 ```
 
-Requires Ruby 3.3+ and `json` 3.x.
+Requires Ruby 3.3+ and `json` 3.x. The optional Rails integration requires Rails 8.1+.
 
 ## Usage
 
@@ -134,7 +134,7 @@ StructuredData.script_tag(team)
 # => "<script type=\"application/ld+json\">{...}</script>"
 ```
 
-With Rails, require the optional integration:
+With Rails (8.1+), require the optional integration:
 
 ```ruby
 # Gemfile

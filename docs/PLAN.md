@@ -200,7 +200,8 @@ Rules:
 - The Railtie includes a helper into `ActionView`:
   `structured_data_tag(*entities)` → one entity renders as a document, several render as a
   `@graph`. It returns an `html_safe` string built from the core `script_tag`.
-- The gem has no runtime dependency on `railties`. CI tests it against Rails 8.0 and 8.1.
+- The gem has no runtime dependency on `railties`. Rails 8.1+ is required, because Rails 8.0
+  is incompatible with json 3. CI tests against Rails 8.1.
 
 ### Client mapping (documented pattern, not gem code)
 
@@ -237,7 +238,7 @@ end
 | Runtime deps | `json ~> 3.0`. Nothing else. | json 3 is safe by default, has no mutable global options (Ractor-safe), rejects unknown options and duplicate keys, and supports `script_safe`. One major version means one CI configuration. |
 | Stdlib used | `json`, `uri`, `date`, `time` | No ActiveSupport, no Zeitwerk (plain `require_relative`; about 25 files). |
 | Dev deps | `minitest ~> 6.0`, `rake`, `rubocop` + `rubocop-minitest` + `rubocop-performance` | Declared in the `Gemfile`, not the gemspec (current Bundler convention). |
-| Rails (test only) | `gemfiles/rails_8_0.gemfile`, `gemfiles/rails_8_1.gemfile` | Use the `BUNDLE_GEMFILE` env in the CI matrix. No Appraisal needed. |
+| Rails (test only) | `gemfiles/rails_8_1.gemfile` | Rails 8.1+ only: ActiveSupport 8.0 passes options that json 3 rejects, so `to_json` fails. Use the `BUNDLE_GEMFILE` env in CI. No Appraisal needed. |
 
 ### Repository layout
 
@@ -253,7 +254,7 @@ structured-data-rb/
 ├── test/fixtures/*.json               # golden JSON-LD outputs
 ├── test/rails/*_test.rb               # run only with a Rails gemfile
 ├── test/dummy/                        # minimal Rails app for end-to-end checks
-├── gemfiles/rails_8_{0,1}.gemfile
+├── gemfiles/rails_8_1.gemfile
 ├── docs/PLAN.md
 ├── README.md, CHANGELOG.md, LICENSE
 ├── AGENTS.md, CLAUDE.md
@@ -289,7 +290,7 @@ Gem name: `structured-data-rb` (free on rubygems.org as of 2026-10-10). Require 
 - `lint`: `bundle exec rubocop` on Ruby 4.0.
 - `test`: matrix of Ruby `3.3`, `3.4`, `4.0`, plus `head` (allowed to fail).
   Runs `bundle exec rake test`.
-- `rails`: Ruby 4.0 × `rails_8_0` / `rails_8_1` gemfiles. Runs `bundle exec rake test:rails`.
+- `rails`: Ruby 4.0 with the `rails_8_1` gemfile. Runs `bundle exec rake test:rails`.
 - `build`: `gem build` and check the file list, so the packaged gem contains no test files.
 - Set `permissions: contents: read` and pin actions by commit SHA. Dependabot handles
   `github-actions` and `bundler` weekly. `ruby/setup-ruby` with `bundler-cache: true`.
@@ -339,7 +340,7 @@ Each step is one PR with tests, and each keeps `master` releasable.
 | 5 | Shared entities: Thing, Organization, Person, ImageObject, Place, WebSite, WebPage, BreadcrumbList/ListItem | Fixtures pass. |
 | 6 | NewsArticle/Article, SportsOrganization, SportsTeam, StadiumOrArena, SportsEvent (+ `subEvent`), `EventStatus` enum | All sports fixtures pass. |
 | 7 | Movie + AggregateRating | Movie fixture passes. |
-| 8 | Optional Rails Railtie + `structured_data_tag` | Rails 8.0/8.1 CI jobs are green. |
+| 8 | Optional Rails Railtie + `structured_data_tag` | The Rails 8.1 CI job is green. |
 | 9 | End-to-end check in a sample Rails app (`test/dummy`): article, breadcrumbs, team, person, event pages | Rich Results Test passes for article and breadcrumb. No warnings we can't explain. |
 | 10 | Release 0.1.0 through trusted publishing | The gem is installable. Attestation is visible on rubygems.org. |
 | 11 | Retro: Google profile (warnings), RBS, codegen decision | Issues filed for v0.2. |
