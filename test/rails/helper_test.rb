@@ -32,7 +32,7 @@ class HelperTest < Minitest::Test
                   b: StructuredData::WebSite.new(name: "Example News"))
     json = html[%r{<script type="application/ld\+json">(.*)</script>}m, 1]
 
-    assert_equal %w[Organization WebSite], JSON.parse(json)["@graph"].map { _1["@type"] }
+    assert_equal(%w[Organization WebSite], JSON.parse(json)["@graph"].map { _1["@type"] })
   end
 
   private
