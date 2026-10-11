@@ -1,0 +1,38 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Movie",
+      "@id": "https://example.com/movies/the-long-season#movie",
+      "name": "The Long Season",
+      "url": "https://example.com/movies/the-long-season",
+      "image": "https://example.com/images/movies/the-long-season.jpg",
+      "dateCreated": "2025-05-16",
+      "genre": [
+        "Drama",
+        "Sport"
+      ],
+      "director": {
+        "@type": "Person",
+        "name": "Chris Lane"
+      },
+      "actor": [
+        {
+          "@type": "Person",
+          "name": "Robin Hale"
+        },
+        {
+          "@type": "Person",
+          "name": "Pat Quinn"
+        }
+      ],
+      "duration": "PT2H8M",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": 8.1,
+        "bestRating": 10,
+        "ratingCount": 12345
+      }
+    }
+  ]
+}

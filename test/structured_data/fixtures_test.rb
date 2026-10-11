@@ -87,6 +87,23 @@ class FixturesTest < Minitest::Test
     assert_fixture "sports_event", event
   end
 
+  def test_movie
+    movie = Movie.new(
+      id: IDS.entity("/movies/the-long-season", :movie),
+      name: "The Long Season",
+      url: "https://example.com/movies/the-long-season",
+      image: "https://example.com/images/movies/the-long-season.jpg",
+      date_created: Date.new(2025, 5, 16),
+      genre: %w[Drama Sport],
+      director: Person.new(name: "Chris Lane"),
+      actor: [Person.new(name: "Robin Hale"), Person.new(name: "Pat Quinn")],
+      duration: "PT2H8M",
+      aggregate_rating: AggregateRating.new(rating_value: 8.1, best_rating: 10, rating_count: 12_345)
+    )
+
+    assert_fixture "movie", movie
+  end
+
   private
 
   def league

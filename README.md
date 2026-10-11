@@ -232,7 +232,7 @@ StructuredData::Person.new(name: "Jane Doe", extra: { "knowsLanguage" => ["en", 
 | Content | `Article`, `NewsArticle` |
 | Events | `Event`, `SportsEvent` |
 | Sports | `SportsOrganization`, `SportsTeam`, `StadiumOrArena` |
-| Media (planned for 0.1) | `Movie`, `AggregateRating` |
+| Media | `Movie`, `AggregateRating` |
 
 Each type supports the Schema.org properties listed in its file in
 [`lib/structured_data/entities`](lib/structured_data/entities), plus everything it inherits.
