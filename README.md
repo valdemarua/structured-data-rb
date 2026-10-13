@@ -48,7 +48,7 @@ The gem is not on rubygems.org yet. Until the first release, install it from Git
 gem "structured-data-rb", github: "valdemarua/structured-data-rb"
 ```
 
-Requires Ruby 3.3+ and `json` 3.x. The optional Rails integration requires Rails 8.1+.
+Requires Ruby 3.3+ and `json` 3.x. The optional Rails integration requires Rails 8.1.4+.
 
 ## Usage
 
@@ -151,7 +151,7 @@ StructuredData.script_tag(organization, team, article)
 # => "<script type=\"application/ld+json\">{...}</script>"
 ```
 
-With Rails (8.1+), require the optional integration:
+With Rails (8.1.4+), require the optional integration:
 
 ```ruby
 # Gemfile
