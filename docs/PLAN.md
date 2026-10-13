@@ -230,8 +230,8 @@ cannot drift from Schema.org.
 - The Railtie includes a helper into `ActionView`:
   `structured_data_tag(*entities)` → one entity renders as a document, several render as a
   `@graph`. It returns an `html_safe` string built from the core `script_tag`.
-- The gem has no runtime dependency on `railties`. Rails 8.1+ is required, because Rails 8.0
-  is incompatible with json 3. CI tests against Rails 8.1.
+- The gem has no runtime dependency on `railties`. Rails 8.1.4+ is required, because earlier
+  versions are incompatible with json 3. CI tests against Rails 8.1.
 
 ### Client mapping (documented pattern, not gem code)
 
@@ -268,7 +268,7 @@ end
 | Runtime deps | `json ~> 3.0`. Nothing else. | json 3 is safe by default, has no mutable global options (Ractor-safe), rejects unknown options and duplicate keys, and supports `script_safe`. One major version means one CI configuration. |
 | Stdlib used | `json`, `date`, `time` | No ActiveSupport, no Zeitwerk (plain `require_relative`; about 25 files). |
 | Dev deps | `minitest ~> 6.0`, `rake`, `rubocop` + `rubocop-minitest` + `rubocop-performance` | Declared in the `Gemfile`, not the gemspec (current Bundler convention). |
-| Rails (test only) | `gemfiles/rails_8_1.gemfile` | Rails 8.1+ only: ActiveSupport 8.0 passes options that json 3 rejects, so `to_json` fails. Use the `BUNDLE_GEMFILE` env in CI. No Appraisal needed. |
+| Rails (test only) | `gemfiles/rails_8_1.gemfile` | Rails 8.1.4+ only: ActiveSupport 8.0 passes options that json 3 rejects, so `to_json` fails, and ActiveSupport 8.1.0–8.1.3 passes `JSON.parse` options positionally, so `ActiveSupport::JSON.decode` fails. Use the `BUNDLE_GEMFILE` env in CI. No Appraisal needed. |
 
 ### Repository layout
 

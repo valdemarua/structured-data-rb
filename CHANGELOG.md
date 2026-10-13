@@ -16,4 +16,4 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - `extra:` on entities for Schema.org properties the gem does not model yet.
 - Schema.org types: `Thing`, `CreativeWork`, `Organization`, `Person`, `ImageObject`, `Place`, `WebSite`, `WebPage`, `CollectionPage`, `ItemList`, `BreadcrumbList` (with `BreadcrumbList.from`), `ListItem`, `Article`, `NewsArticle`, `Event`, `SportsEvent`, `SportsOrganization`, `SportsTeam`, `StadiumOrArena`, `Movie`, `AggregateRating`.
 - `NewsMediaOrganization`, the `Organization` subtype for news publishers.
-- Optional Rails integration (`require "structured_data/rails"`, Rails 8.1+): the `structured_data_tag` view helper.
+- Optional Rails integration (`require "structured_data/rails"`, Rails 8.1.4+): the `structured_data_tag` view helper.
