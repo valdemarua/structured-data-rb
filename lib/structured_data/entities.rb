@@ -4,6 +4,7 @@
 require_relative "entities/thing"
 require_relative "entities/creative_work"
 require_relative "entities/organization"
+require_relative "entities/news_media_organization"
 require_relative "entities/sports_organization"
 require_relative "entities/sports_team"
 require_relative "entities/person"

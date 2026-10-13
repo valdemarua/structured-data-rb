@@ -49,7 +49,18 @@ class EntitiesTest < Minitest::Test
   end
 
   def test_schema_type_is_the_class_name
-    assert_equal %w[StadiumOrArena NewsArticle CollectionPage],
-                 [StadiumOrArena, NewsArticle, CollectionPage].map(&:schema_type)
+    assert_equal %w[StadiumOrArena NewsArticle CollectionPage NewsMediaOrganization],
+                 [StadiumOrArena, NewsArticle, CollectionPage, NewsMediaOrganization].map(&:schema_type)
+  end
+
+  def test_news_media_organization_is_an_organization
+    publisher = NewsMediaOrganization.new(id: "https://example.com/#organization", name: "Example News",
+                                          url: "https://example.com/", logo: "https://example.com/logo.png")
+
+    assert_equal(
+      { "@type" => "NewsMediaOrganization", "@id" => "https://example.com/#organization", "name" => "Example News",
+        "url" => "https://example.com/", "logo" => "https://example.com/logo.png" },
+      publisher.to_h
+    )
   end
 end
