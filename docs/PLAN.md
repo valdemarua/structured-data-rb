@@ -54,9 +54,9 @@ documented recommendations where Google has a matching feature.
 4. `SportsOrganization` (a league) and `SportsTeam`: `sport`, `logo`, `foundingDate`,
    `memberOf`, `athlete`, `coach`.
 5. `Person` for athletes and authors: `name`, `alternateName`, `image`, `birthDate`,
-   `nationality`, `memberOf`.
+   `nationality`, `memberOf`, `height` / `weight` (`QuantitativeValue`).
 6. `SportsEvent` for matches: `homeTeam`, `awayTeam`, `competitor`, `startDate`, `endDate`,
-   `eventStatus`, `location` (`Place` / `StadiumOrArena`), `sport`, `superEvent`.
+   `eventStatus`, `location` (`Place` / `StadiumOrArena` with a `PostalAddress`), `sport`, `superEvent`.
 7. `SportsEvent` with `subEvent` for multi-session events, such as a race weekend with
    practice, qualifying and race.
 8. `Movie` + `AggregateRating`.
@@ -75,11 +75,12 @@ documented recommendations where Google has a matching feature.
 - Standings or league tables. There is no suitable Schema.org type.
 
 **v0.1 entity list:** `Thing` (base), `CreativeWork`, `Organization`,
-`NewsMediaOrganization`, `SportsOrganization`, `SportsTeam`, `Person`, `ImageObject`,
-`Place`, `StadiumOrArena`, `WebSite`, `WebPage`, `CollectionPage`, `ItemList`,
-`BreadcrumbList`, `ListItem`, `Article`, `NewsArticle`, `Event`, `SportsEvent`, `Movie`,
-`AggregateRating`. Each is a short property list; intermediate Schema.org types
-(`Intangible`, `MediaObject`, `CivicStructure`) are skipped where nothing needs them.
+`NewsMediaOrganization`, `PostalAddress`, `QuantitativeValue`, `SportsOrganization`,
+`SportsTeam`, `Person`, `ImageObject`, `Place`, `StadiumOrArena`, `WebSite`, `WebPage`,
+`CollectionPage`, `ItemList`, `BreadcrumbList`, `ListItem`, `Article`, `NewsArticle`,
+`Event`, `SportsEvent`, `Movie`, `AggregateRating`. Each is a short property list;
+intermediate Schema.org types (`Intangible`, `MediaObject`, `CivicStructure`) are skipped
+where nothing needs them.
 
 ## 3. Lessons from other ecosystems
 

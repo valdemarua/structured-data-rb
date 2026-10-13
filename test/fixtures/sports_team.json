@@ -28,7 +28,17 @@
           "name": "Sam Carter",
           "url": "https://example.com/people/sam-carter",
           "image": "https://example.com/images/people/sam-carter.png",
-          "birthDate": "2001-03-04"
+          "birthDate": "2001-03-04",
+          "height": {
+            "@type": "QuantitativeValue",
+            "value": 198,
+            "unitCode": "CMT"
+          },
+          "weight": {
+            "@type": "QuantitativeValue",
+            "value": 95,
+            "unitCode": "KGM"
+          }
         },
         {
           "@type": "Person",

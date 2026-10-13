@@ -61,7 +61,9 @@ class FixturesTest < Minitest::Test
       sport: "Basketball",
       athlete: [
         person("sam-carter", "Sam Carter", image: "https://example.com/images/people/sam-carter.png",
-                                           birth_date: Date.new(2001, 3, 4)),
+                                           birth_date: Date.new(2001, 3, 4),
+                                           height: QuantitativeValue.new(value: 198, unit_code: "CMT"),
+                                           weight: QuantitativeValue.new(value: 95, unit_code: "KGM")),
         person("lee-park", "Lee Park", birth_date: Date.new(1999, 11, 20))
       ],
       coach: person("alex-morgan", "Alex Morgan")
@@ -77,7 +79,10 @@ class FixturesTest < Minitest::Test
       url: "https://example.com/games/1042",
       start_date: Time.new(2026, 10, 14, 19, 30, 0, "-04:00"),
       event_status: "EventScheduled",
-      location: StadiumOrArena.new(name: "Riverside Arena"),
+      location: StadiumOrArena.new(
+        name: "Riverside Arena",
+        address: PostalAddress.new(address_locality: "Riverside", address_region: "CA", address_country: "US")
+      ),
       organizer: league.ref,
       sport: "Basketball",
       home_team: team("riverside-rovers", "Riverside Rovers"),

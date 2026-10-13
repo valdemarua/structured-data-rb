@@ -10,7 +10,13 @@
       "eventStatus": "https://schema.org/EventScheduled",
       "location": {
         "@type": "StadiumOrArena",
-        "name": "Riverside Arena"
+        "name": "Riverside Arena",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Riverside",
+          "addressRegion": "CA",
+          "addressCountry": "US"
+        }
       },
       "organizer": {
         "@id": "https://example.com/leagues/national-league#organization"
