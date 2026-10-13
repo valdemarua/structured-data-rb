@@ -226,7 +226,8 @@ StructuredData::Person.new(name: "Jane Doe", extra: { "knowsLanguage" => ["en", 
 
 | Group | Types |
 |---|---|
-| Core | `Thing`, `CreativeWork`, `Organization`, `NewsMediaOrganization`, `Person`, `ImageObject`, `Place` |
+| Core | `Thing`, `CreativeWork`, `Organization`, `NewsMediaOrganization`, `Person`, `ImageObject`, `Place`, `PostalAddress` |
+| Values | `QuantitativeValue` |
 | Site | `WebSite`, `WebPage`, `CollectionPage` |
 | Lists | `ItemList`, `BreadcrumbList`, `ListItem` |
 | Content | `Article`, `NewsArticle` |
