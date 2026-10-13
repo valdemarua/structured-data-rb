@@ -45,6 +45,7 @@ documented recommendations where Google has a matching feature.
 **P0, shipped in v0.1**
 
 1. `Organization` and `WebSite`: site-wide nodes, usually referenced by `@id`.
+   `NewsMediaOrganization` is the `Organization` subtype for news publishers.
 2. `Article` and `NewsArticle`, with `Person` / `Organization` as `author` and `publisher`,
    `ImageObject`, and `about` / `mentions` references to other entities. Article is a
    Google rich-result feature.
@@ -73,11 +74,12 @@ documented recommendations where Google has a matching feature.
   `Person` instead.
 - Standings or league tables. There is no suitable Schema.org type.
 
-**v0.1 entity list:** `Thing` (base), `CreativeWork`, `Organization`, `SportsOrganization`,
-`SportsTeam`, `Person`, `ImageObject`, `Place`, `StadiumOrArena`, `WebSite`, `WebPage`,
-`CollectionPage`, `ItemList`, `BreadcrumbList`, `ListItem`, `Article`, `NewsArticle`, `Event`,
-`SportsEvent`, `Movie`, `AggregateRating`. Each is a short property list; intermediate
-Schema.org types (`Intangible`, `MediaObject`, `CivicStructure`) are skipped where nothing needs them.
+**v0.1 entity list:** `Thing` (base), `CreativeWork`, `Organization`,
+`NewsMediaOrganization`, `SportsOrganization`, `SportsTeam`, `Person`, `ImageObject`,
+`Place`, `StadiumOrArena`, `WebSite`, `WebPage`, `CollectionPage`, `ItemList`,
+`BreadcrumbList`, `ListItem`, `Article`, `NewsArticle`, `Event`, `SportsEvent`, `Movie`,
+`AggregateRating`. Each is a short property list; intermediate Schema.org types
+(`Intangible`, `MediaObject`, `CivicStructure`) are skipped where nothing needs them.
 
 ## 3. Lessons from other ecosystems
 
