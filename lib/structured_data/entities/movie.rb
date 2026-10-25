@@ -3,6 +3,6 @@
 module StructuredData
   # https://schema.org/Movie
   class Movie < CreativeWork
-    properties :director, :actor, :duration, :production_company, :country_of_origin
+    properties :director, :actor, :duration, :production_company, :country_of_origin, :trailer
   end
 end

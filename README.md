@@ -226,14 +226,14 @@ StructuredData::Person.new(name: "Jane Doe", extra: { "knowsLanguage" => ["en", 
 
 | Group | Types |
 |---|---|
-| Core | `Thing`, `CreativeWork`, `Organization`, `NewsMediaOrganization`, `Person`, `ImageObject`, `Place`, `PostalAddress` |
+| Core | `Thing`, `CreativeWork`, `Organization`, `NewsMediaOrganization`, `Person`, `MediaObject`, `ImageObject`, `VideoObject`, `Place`, `PostalAddress` |
 | Values | `QuantitativeValue` |
 | Site | `WebSite`, `WebPage`, `CollectionPage` |
 | Lists | `ItemList`, `BreadcrumbList`, `ListItem` |
 | Content | `Article`, `NewsArticle` |
 | Events | `Event`, `SportsEvent` |
 | Sports | `SportsOrganization`, `SportsTeam`, `StadiumOrArena` |
-| Media | `Movie`, `AggregateRating` |
+| Media | `Movie`, `TVSeries`, `TVSeason`, `TVEpisode`, `AggregateRating` |
 
 Each type supports the Schema.org properties listed in its file in
 [`lib/structured_data/entities`](lib/structured_data/entities), plus everything it inherits.

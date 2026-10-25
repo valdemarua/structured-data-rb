@@ -49,8 +49,30 @@ class EntitiesTest < Minitest::Test
   end
 
   def test_schema_type_is_the_class_name
-    assert_equal %w[StadiumOrArena NewsArticle CollectionPage NewsMediaOrganization],
-                 [StadiumOrArena, NewsArticle, CollectionPage, NewsMediaOrganization].map(&:schema_type)
+    assert_equal %w[StadiumOrArena NewsArticle CollectionPage NewsMediaOrganization TVSeries TVSeason TVEpisode],
+                 [StadiumOrArena, NewsArticle, CollectionPage, NewsMediaOrganization, TVSeries, TVSeason,
+                  TVEpisode].map(&:schema_type)
+  end
+
+  def test_image_and_video_objects_are_media_objects
+    image = ImageObject.new(content_url: "https://example.com/a.jpg", width: 800, caption: "A photo")
+    video = VideoObject.new(name: "Trailer", thumbnail_url: "https://example.com/a.jpg", upload_date: "2026-01-02",
+                            embed_url: "https://example.com/embed/1", duration: "PT1M")
+
+    assert_equal %w[@type contentUrl width caption], image.to_h.keys
+    assert_equal %w[@type name thumbnailUrl uploadDate embedUrl duration], video.to_h.keys
+  end
+
+  def test_video_object_checks_upload_date
+    error = assert_raises(ValidationError) { VideoObject.new(upload_date: "yesterday") }
+
+    assert_equal 'VideoObject upload_date: expected an ISO 8601 date, got "yesterday"', error.message
+  end
+
+  def test_person_death_date
+    person = Person.new(name: "Jane Doe", birth_date: Date.new(1931, 5, 4), death_date: Date.new(2020, 1, 9))
+
+    assert_equal "2020-01-09", person.to_h["deathDate"]
   end
 
   def test_news_media_organization_is_an_organization
