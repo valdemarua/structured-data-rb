@@ -5,6 +5,6 @@ module StructuredData
   class Person < Thing
     properties :given_name, :family_name, :birth_place, :nationality, :gender, :job_title, :affiliation,
                :member_of, :works_for, :height, :weight
-    date_properties :birth_date
+    date_properties :birth_date, :death_date
   end
 end

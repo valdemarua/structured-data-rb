@@ -17,4 +17,5 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - Schema.org types: `Thing`, `CreativeWork`, `Organization`, `Person`, `ImageObject`, `Place`, `WebSite`, `WebPage`, `CollectionPage`, `ItemList`, `BreadcrumbList` (with `BreadcrumbList.from`), `ListItem`, `Article`, `NewsArticle`, `Event`, `SportsEvent`, `SportsOrganization`, `SportsTeam`, `StadiumOrArena`, `Movie`, `AggregateRating`.
 - `NewsMediaOrganization`, the `Organization` subtype for news publishers.
 - `PostalAddress` for `Place.address`, and `QuantitativeValue` with `Person` `height` and `weight`.
+- `TVSeries`, `TVSeason` and `TVEpisode`, `VideoObject` (with `MediaObject`, now also the parent of `ImageObject`), `trailer` on `Movie` and the TV types, `content_rating` on `CreativeWork`, and `death_date` on `Person`.
 - Optional Rails integration (`require "structured_data/rails"`, Rails 8.1.4+): the `structured_data_tag` view helper.

@@ -27,6 +27,17 @@
         }
       ],
       "duration": "PT2H8M",
+      "contentRating": "PG-13",
+      "trailer": {
+        "@type": "VideoObject",
+        "name": "The Long Season: official trailer",
+        "thumbnailUrl": "https://example.com/images/trailers/the-long-season.jpg",
+        "uploadDate": "2025-03-02",
+        "description": "The Long Season: official trailer.",
+        "contentUrl": "https://example.com/videos/trailers/the-long-season.mp4",
+        "embedUrl": "https://example.com/embed/trailers/the-long-season",
+        "duration": "PT2M30S"
+      },
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": 8.1,

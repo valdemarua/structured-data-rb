@@ -60,6 +60,10 @@ documented recommendations where Google has a matching feature.
 7. `SportsEvent` with `subEvent` for multi-session events, such as a race weekend with
    practice, qualifying and race.
 8. `Movie` + `AggregateRating`.
+9. `TVSeries`, `TVSeason` and `TVEpisode`, linked with `containsSeason` / `episode` and
+   `partOfSeries` / `partOfSeason`, plus `contentRating` and `trailer`. The trailer is a
+   `VideoObject`; Google's video results require `name`, `thumbnailUrl` and `uploadDate`.
+   `Person` gains `deathDate`.
 
 **P1, in v0.1 if time allows, otherwise v0.2**
 
@@ -78,9 +82,11 @@ documented recommendations where Google has a matching feature.
 `NewsMediaOrganization`, `PostalAddress`, `QuantitativeValue`, `SportsOrganization`,
 `SportsTeam`, `Person`, `ImageObject`, `Place`, `StadiumOrArena`, `WebSite`, `WebPage`,
 `CollectionPage`, `ItemList`, `BreadcrumbList`, `ListItem`, `Article`, `NewsArticle`,
-`Event`, `SportsEvent`, `Movie`, `AggregateRating`. Each is a short property list;
-intermediate Schema.org types (`Intangible`, `MediaObject`, `CivicStructure`) are skipped
-where nothing needs them.
+`Event`, `SportsEvent`, `Movie`, `TVSeries`, `TVSeason`, `TVEpisode`, `MediaObject`,
+`VideoObject`, `AggregateRating`. Each is a short property list; intermediate Schema.org
+types (`Intangible`, `CreativeWorkSeries`, `CreativeWorkSeason`, `Episode`, `CivicStructure`)
+are skipped where nothing needs them. `MediaObject` is kept because `ImageObject` and
+`VideoObject` share its properties.
 
 ## 3. Lessons from other ecosystems
 
@@ -302,7 +308,7 @@ Gem name: `structured-data-rb` (free on rubygems.org as of 2026-10-10). Require 
 - Use the `Minitest::Test` style, one file per entity plus core files. Plain `assert_equal`
   on Hashes; no mocks needed.
 - **Golden fixtures:** for each realistic example (news article, sports team page, match,
-  multi-session race weekend, movie), `to_h` is compared with
+  multi-session race weekend, movie, TV episode), `to_h` is compared with
   `test/fixtures/<name>.json`. Regenerate them with `UPDATE_FIXTURES=1 rake test` and
   review the diff.
 - **Escaping tests:** `</script>`, `<!--`, `&`, U+2028, non-ASCII text, emoji.

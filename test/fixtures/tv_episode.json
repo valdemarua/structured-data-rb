@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TVSeries",
+      "@id": "https://example.com/series/harbor-lights#series",
+      "name": "Harbor Lights",
+      "url": "https://example.com/series/harbor-lights",
+      "image": "https://example.com/images/series/harbor-lights.jpg",
+      "genre": "Drama",
+      "contentRating": "TV-14",
+      "startDate": "2023-09-12",
+      "endDate": "2025-06-03",
+      "numberOfSeasons": 3,
+      "actor": {
+        "@type": "Person",
+        "name": "Robin Hale",
+        "birthDate": "1948-02-11",
+        "deathDate": "2024-12-30"
+      },
+      "trailer": {
+        "@type": "VideoObject",
+        "name": "Harbor Lights: series trailer",
+        "thumbnailUrl": "https://example.com/images/trailers/harbor-lights.jpg",
+        "uploadDate": "2023-08-01",
+        "description": "Harbor Lights: series trailer.",
+        "contentUrl": "https://example.com/videos/trailers/harbor-lights.mp4",
+        "embedUrl": "https://example.com/embed/trailers/harbor-lights",
+        "duration": "PT2M30S"
+      }
+    },
+    {
+      "@type": "TVSeason",
+      "@id": "https://example.com/series/harbor-lights/season-2#season",
+      "name": "Season 2",
+      "url": "https://example.com/series/harbor-lights/season-2",
+      "seasonNumber": 2,
+      "numberOfEpisodes": 10,
+      "startDate": "2024-09-10",
+      "partOfSeries": {
+        "@id": "https://example.com/series/harbor-lights#series"
+      }
+    },
+    {
+      "@type": "TVEpisode",
+      "@id": "https://example.com/series/harbor-lights/season-2/episode-3#episode",
+      "name": "Low Tide",
+      "url": "https://example.com/series/harbor-lights/season-2/episode-3",
+      "episodeNumber": 3,
+      "datePublished": "2024-09-24",
+      "duration": "PT52M",
+      "director": {
+        "@type": "Person",
+        "name": "Chris Lane"
+      },
+      "partOfSeason": {
+        "@id": "https://example.com/series/harbor-lights/season-2#season"
+      },
+      "partOfSeries": {
+        "@id": "https://example.com/series/harbor-lights#series"
+      }
+    }
+  ]
+}

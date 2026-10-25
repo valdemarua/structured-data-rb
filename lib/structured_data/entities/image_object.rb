@@ -2,8 +2,7 @@
 
 module StructuredData
   # https://schema.org/ImageObject
-  class ImageObject < CreativeWork
-    properties :width, :height, :caption, :encoding_format
-    url_properties :content_url
+  class ImageObject < MediaObject
+    properties :caption
   end
 end

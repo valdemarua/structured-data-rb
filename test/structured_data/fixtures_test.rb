@@ -103,10 +103,50 @@ class FixturesTest < Minitest::Test
       director: Person.new(name: "Chris Lane"),
       actor: [Person.new(name: "Robin Hale"), Person.new(name: "Pat Quinn")],
       duration: "PT2H8M",
+      content_rating: "PG-13",
+      trailer: trailer("the-long-season", "The Long Season: official trailer", Date.new(2025, 3, 2)),
       aggregate_rating: AggregateRating.new(rating_value: 8.1, best_rating: 10, rating_count: 12_345)
     )
 
     assert_fixture "movie", movie
+  end
+
+  def test_tv_episode
+    series = TVSeries.new(
+      id: IDS.entity("/series/harbor-lights", :series),
+      name: "Harbor Lights",
+      url: "https://example.com/series/harbor-lights",
+      image: "https://example.com/images/series/harbor-lights.jpg",
+      genre: "Drama",
+      content_rating: "TV-14",
+      start_date: "2023-09-12",
+      end_date: "2025-06-03",
+      number_of_seasons: 3,
+      actor: Person.new(name: "Robin Hale", birth_date: "1948-02-11", death_date: "2024-12-30"),
+      trailer: trailer("harbor-lights", "Harbor Lights: series trailer", Date.new(2023, 8, 1))
+    )
+    season = TVSeason.new(
+      id: IDS.entity("/series/harbor-lights/season-2", :season),
+      name: "Season 2",
+      url: "https://example.com/series/harbor-lights/season-2",
+      season_number: 2,
+      number_of_episodes: 10,
+      start_date: "2024-09-10",
+      part_of_series: series.ref
+    )
+    episode = TVEpisode.new(
+      id: IDS.entity("/series/harbor-lights/season-2/episode-3", :episode),
+      name: "Low Tide",
+      url: "https://example.com/series/harbor-lights/season-2/episode-3",
+      episode_number: 3,
+      date_published: Date.new(2024, 9, 24),
+      duration: "PT52M",
+      director: Person.new(name: "Chris Lane"),
+      part_of_season: season.ref,
+      part_of_series: series.ref
+    )
+
+    assert_fixture "tv_episode", series, season, episode
   end
 
   private
@@ -123,6 +163,18 @@ class FixturesTest < Minitest::Test
   def person(slug, name, **properties)
     Person.new(id: IDS.entity("/people/#{slug}", :person), name: name, url: "https://example.com/people/#{slug}",
                **properties)
+  end
+
+  def trailer(slug, name, upload_date)
+    VideoObject.new(
+      name: name,
+      thumbnail_url: "https://example.com/images/trailers/#{slug}.jpg",
+      upload_date: upload_date,
+      description: "#{name}.",
+      content_url: "https://example.com/videos/trailers/#{slug}.mp4",
+      embed_url: "https://example.com/embed/trailers/#{slug}",
+      duration: "PT2M30S"
+    )
   end
 
   def team(slug, name)
