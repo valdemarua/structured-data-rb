@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+# The newest json 2.x, for apps not yet on json 3 (the main Gemfile uses 3.x).
+gem "json", "~> 2.7"
+gem "minitest", "~> 6.0"
+gem "rake", "~> 13.4"

@@ -30,11 +30,11 @@ class DocumentTest < Minitest::Test
   end
 
   def test_json_ld_escapes_for_script_tags
-    json = StructuredData.json_ld(Thing.new(name: "</script><!-- & \u2028"))
+    json = StructuredData.json_ld(Thing.new(name: "</script><!-- & \u2028\u2029"))
 
-    refute_match(/[<>&\u2028]/, json)
-    assert_includes json, "\\u003c\\/script\\u003e\\u003c!-- \\u0026 \\u2028"
-    assert_equal "</script><!-- & \u2028", JSON.parse(json).dig("@graph", 0, "name")
+    refute_match(/[<>&\u2028\u2029]/, json)
+    assert_includes json, "\\u003c\\/script\\u003e\\u003c!-- \\u0026 \\u2028\\u2029"
+    assert_equal "</script><!-- & \u2028\u2029", JSON.parse(json).dig("@graph", 0, "name")
   end
 
   def test_json_ld_keeps_non_ascii_readable

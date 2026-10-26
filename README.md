@@ -30,8 +30,8 @@ parsers read it as an ordinary `/`.
 - **JSON-LD only.** It is the format search engines recommend, and the only one this gem
   produces.
 - **Almost no dependencies.** The only runtime dependency is Ruby's own
-  [`json`](https://github.com/ruby/json) library (version 3). No Rails, ActiveSupport or
-  ActiveRecord is needed.
+  [`json`](https://github.com/ruby/json) library (2.7 or newer, including 3.x). No Rails,
+  ActiveSupport or ActiveRecord is needed.
 - **Fails early.** Unknown properties, relative URLs and unknown enum values raise errors
   that name the property.
 - **Safe to embed.** Output is escaped for `<script>` tags. Non-ASCII text (Cyrillic, CJK,
@@ -48,7 +48,18 @@ The gem is not on rubygems.org yet. Until the first release, install it from Git
 gem "structured-data-rb", github: "valdemarua/structured-data-rb"
 ```
 
-Requires Ruby 3.3+ and `json` 3.x. The optional Rails integration requires Rails 8.1.4+.
+Requires Ruby 3.3+ and `json` 2.7 or newer (3.x included). The gem never forces a json
+upgrade: it works with whichever version your app already has. The optional Rails
+integration supports Rails 7.1+.
+
+| | Tested in CI |
+| --- | --- |
+| Ruby | 3.3, 3.4, 4.0 |
+| json | 2.7, the newest 2.x, 3.x |
+| Rails (optional) | 7.1, 7.2, 8.0 with json 2.x; 8.1 with json 3.x |
+
+json 3 needs Rails 8.1.4 or newer (earlier ActiveSupport can't parse with it), so an app on
+an older Rails keeps json 2.x, which this gem supports.
 
 ## Usage
 
@@ -151,7 +162,7 @@ StructuredData.script_tag(organization, team, article)
 # => "<script type=\"application/ld+json\">{...}</script>"
 ```
 
-With Rails (8.1.4+), require the optional integration:
+With Rails (7.1+), require the optional integration:
 
 ```ruby
 # Gemfile

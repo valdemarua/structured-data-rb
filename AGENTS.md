@@ -14,7 +14,7 @@ Full design and roadmap: `docs/PLAN.md`. Read it before changing the public API.
 
 ## Rules
 
-- Core must not require Rails, ActiveSupport or ActiveRecord. The only runtime dependency is `json ~> 3.0`. Ask before adding another.
+- Core must not require Rails, ActiveSupport or ActiveRecord. The only runtime dependency is `json >= 2.7, < 4` (2.7 brought `script_safe`). Keep it that loose: a library's constraint is forced on every app that uses it. Ask before adding another dependency.
 - Support Ruby >= 3.3. Load files with `require_relative`. Do not use Zeitwerk.
 - JSON-LD only. Add Schema.org types and properties deliberately, following the order in `docs/PLAN.md`; never model the full vocabulary. Each entity file starts with a comment linking its `https://schema.org/<Type>` page.
 - Output follows what the client passed: `@type`, `@id`, then properties in the order given; single values and arrays are kept as is. `nil` values and empty arrays are omitted.
@@ -33,7 +33,7 @@ Full design and roadmap: `docs/PLAN.md`. Read it before changing the public API.
 ## Tools
 
 - Setup: `bundle install`
-- Tests (Minitest): `bundle exec rake test`. Rails helper tests: `BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rake test:rails`.
+- Tests (Minitest): `bundle exec rake test`. On json 2.x: `BUNDLE_GEMFILE=gemfiles/json_2_7.gemfile` (or `json_2`). Rails helper tests: `BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rake test:rails` (also `rails_7_1`, `rails_7_2`, `rails_8_0`).
 - Golden fixtures live in `test/fixtures/*.json`. Regenerate them with `UPDATE_FIXTURES=1 bundle exec rake test` and review the diff.
 - Lint: `bundle exec rubocop`
 - Schema.org vocabulary check: `bundle exec rake vocab`
