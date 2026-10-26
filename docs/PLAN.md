@@ -328,7 +328,7 @@ Gem name: `structured-data-rb` (free on rubygems.org as of 2026-10-10). Require 
 `ci.yml` runs on push and pull requests:
 
 - `lint`: `bundle exec rubocop` on Ruby 4.0.
-- `test`: matrix of Ruby `3.3`, `3.4`, `4.0`, plus `head` (allowed to fail).
+- `test`: matrix of Ruby `3.3`, `3.4`, `4.0` (released versions only).
   Runs `bundle exec rake test`.
 - `rails`: Ruby 4.0 with the `rails_8_1` gemfile. Runs `bundle exec rake test:rails`.
 - `build`: `gem build` and check the file list, so the packaged gem contains no test files.
