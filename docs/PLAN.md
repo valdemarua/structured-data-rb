@@ -217,7 +217,8 @@ Rules:
 - `StructuredData.script_tag(*entities)` returns the full
   `<script type="application/ld+json">…</script>` string. It is pure Ruby and not
   `html_safe` (core knows nothing about Rails).
-- No global configuration. This matches json 3, which dropped mutable global defaults.
+- No global configuration. This matches json 3, which dropped mutable global defaults, and
+  works the same on json 2.7+, which the gem also supports.
   Site-wide values such as the base URL and `inLanguage` are passed explicitly, e.g. through
   an `Ids` instance the client creates.
 
@@ -237,8 +238,8 @@ cannot drift from Schema.org.
 - The Railtie includes a helper into `ActionView`:
   `structured_data_tag(*entities)` → one entity renders as a document, several render as a
   `@graph`. It returns an `html_safe` string built from the core `script_tag`.
-- The gem has no runtime dependency on `railties`. Rails 8.1.4+ is required, because earlier
-  versions are incompatible with json 3. CI tests against Rails 8.1.
+- The gem has no runtime dependency on `railties`. Rails 7.1+ is supported. CI tests 7.1,
+  7.2 and 8.0 with json 2.x, and 8.1 with json 3.x (json 3 itself needs Rails 8.1.4+).
 
 ### Client mapping (documented pattern, not gem code)
 

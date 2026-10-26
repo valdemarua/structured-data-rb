@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "actionpack", "~> 8.0.0"
+gem "railties", "~> 8.0.0"
+# Rails before 8.1.4 can't parse JSON with json 3, so these apps stay on json 2.x.
+gem "json", "~> 2.7"
+gem "minitest", "~> 6.0"
+gem "rake", "~> 13.4"

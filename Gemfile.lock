@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     structured-data-rb (0.0.0)
-      json (~> 3.0)
+      json (>= 2.7, < 4)
 
 GEM
   remote: https://rubygems.org/

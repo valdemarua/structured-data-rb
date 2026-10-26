@@ -19,3 +19,8 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - `PostalAddress` for `Place.address`, and `QuantitativeValue` with `Person` `height` and `weight`.
 - `TVSeries`, `TVSeason` and `TVEpisode`, `VideoObject` (with `MediaObject`, now also the parent of `ImageObject`), `trailer` on `Movie` and the TV types, `content_rating` on `CreativeWork`, and `death_date` on `Person`.
 - Optional Rails integration (`require "structured_data/rails"`, Rails 8.1.4+): the `structured_data_tag` view helper.
+### Changed
+
+- `json` dependency widened from `~> 3.0` to `>= 2.7, < 4`. The gem only needs `JSON.generate(..., script_safe: true)` (json 2.7+), so it no longer forces apps onto json 3. Output is identical on json 2.7, the newest 2.x and 3.x, which CI now tests.
+- The optional Rails integration supports Rails 7.1+ (was 8.1.4+). CI tests Rails 7.1, 7.2 and 8.0 with json 2.x and 8.1 with json 3.x.
+
